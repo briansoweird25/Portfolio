@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vincent Brian Somido — Web Developer</title>
+  <meta name="description" content="Vincent Brian Somido — web developer from Antipolo City, Philippines. Clean, user-first web apps with an e-commerce background.">
+  <meta property="og:title" content="Vincent Brian Somido — Web Developer">
+  <meta property="og:description" content="Clean, user-first web applications, built with a product mindset.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="wrap nav__in">
+      <a class="logo" href="#top" aria-label="Home">Vincent Brian Somido</a>
+      <nav class="nav__links" id="navLinks" aria-label="Primary">
+        <a href="#projects">Projects</a>
+        <a href="#experience">Experience</a>
+        <a href="#skills">Skills</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="nav__tools">
+        <button class="kbd-btn" id="openPalette" type="button" aria-label="Open command menu">
+          <span>quick menu</span><kbd>⌘</kbd><kbd>K</kbd>
+        </button>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme">
+          <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+        <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero wrap" id="top">
+      <p class="badge"><span class="dot"></span> Available for freelance &amp; part-time</p>
+      <h1 class="hero__title">Vincent Brian Somido</h1>
+      <p class="hero__lead">
+        I'm a <em>web developer</em> who builds <em>clean, user-first</em> web apps.
+        Before writing production code, I spent years inside <em>e-commerce</em> — so I build with the eyes of someone who has lived in product listings, customer pain points and data dashboards.
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="#projects">View projects</a>
+        <a class="btn" href="#contact">Get in touch</a>
+      </div>
+      <dl class="stats">
+        <div><dt>Years of experience</dt><dd>4<span>+</span></dd></div>
+        <div><dt>Projects</dt><dd>7</dd></div>
+        <div><dt>Based in</dt><dd>PH</dd></div>
+      </dl>
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="section wrap" id="projects">
+      <header class="section__head reveal">
+        <h2><span class="num">01 —</span> projects</h2>
+        <p class="muted">Work in progress. Click a card for details.</p>
+      </header>
+      <div class="grid" id="projectGrid" aria-live="polite"></div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section class="section wrap" id="experience">
+      <header class="section__head reveal">
+        <h2><span class="num">02 —</span> experience</h2>
+        <p class="muted">Inside e-commerce operations, before code.</p>
+      </header>
+      <ol class="timeline">
+        <li class="reveal">
+          <span class="when">2024 — 2025</span>
+          <div>
+            <h3>Customer Service Representative</h3>
+            <p class="org">E-commerce Company</p>
+            <p>Multi-channel support, order management, and cross-team collaboration for a fast-moving e-commerce operation.</p>
+          </div>
+        </li>
+        <li class="reveal">
+          <span class="when">2022 — 2024</span>
+          <div>
+            <h3>Product Lister</h3>
+            <p class="org">E-commerce Company</p>
+            <p>Managed product catalog quality, analyzed performance data, and optimized listings to increase sales visibility.</p>
+          </div>
+        </li>
+        <li class="reveal">
+          <span class="when">2021 — 2022</span>
+          <div>
+            <h3>Customer Service Associate</h3>
+            <p class="org">E-commerce Company</p>
+            <p>Resolved high-volume customer inquiries and coordinated on returns, exchanges, and refunds.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="section wrap" id="skills">
+      <header class="section__head reveal">
+        <h2><span class="num">03 —</span> skills</h2>
+        <p class="muted">Frontend flair, backend logic, and real-world product thinking.</p>
+      </header>
+      <ul class="skills">
+        <li class="reveal"><div><h3>HTML &amp; CSS</h3><p>Semantic markup, responsive layouts, Flexbox, Grid, CSS animations, and modern design systems.</p></div><span class="level" data-l="3">Advanced</span></li>
+        <li class="reveal"><div><h3>JavaScript</h3><p>DOM manipulation, async/await, fetch API, ES6+ features, and event-driven programming.</p></div><span class="level" data-l="2">Intermediate</span></li>
+        <li class="reveal"><div><h3>PHP</h3><p>Server-side scripting, form handling, session management, and full CRUD applications.</p></div><span class="level" data-l="2">Intermediate</span></li>
+        <li class="reveal"><div><h3>MySQL</h3><p>Database design, complex queries, joins, indexing, and relational data modeling.</p></div><span class="level" data-l="2">Intermediate</span></li>
+        <li class="reveal"><div><h3>System Development</h3><p>CRUD applications, MVC patterns, REST API consumption, and system architecture basics.</p></div><span class="level" data-l="2">Intermediate</span></li>
+        <li class="reveal"><div><h3>Data &amp; Analytics</h3><p>Product performance tracking, trend analysis, reporting, and data-driven decision making.</p></div><span class="level" data-l="3">Advanced</span></li>
+      </ul>
+      <p class="stack-label muted reveal">Stack</p>
+      <ul class="chips reveal">
+        <li>HTML</li><li>CSS</li><li>JavaScript</li><li>PHP</li><li>MySQL</li><li>Bootstrap</li><li>Next.js</li><li>TypeScript</li><li>Tailwind</li><li>React</li><li>Figma</li>
+      </ul>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section wrap" id="about">
+      <header class="section__head reveal">
+        <h2><span class="num">04 —</span> about</h2>
+        <p class="muted">The story so far.</p>
+      </header>
+      <div class="about reveal">
+        <p class="about__big">I don't just build websites. I build them with the eyes of someone who has lived inside product listings, customer pain points, and data dashboards.</p>
+        <p>My background in customer service and product management gives me a rare perspective: I understand what users actually need, not just what looks good in a mockup. I'm now focused on translating that insight into clean, efficient web applications.</p>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section wrap" id="contact">
+      <header class="section__head reveal">
+        <h2><span class="num">05 —</span> get in touch</h2>
+        <p class="muted">Open to freelance projects and collaborations. If you have a project in mind or just want to say hello — I'd love to hear from you.</p>
+      </header>
+      <div class="contact">
+        <div class="card reveal">
+          <h3>Say hello</h3>
+          <p class="muted">For work, collabs, or just to say hi — drop me a line.</p>
+          <p class="mail" id="mailText">Vincentsomido25@gmail.com</p>
+          <div class="row">
+            <button class="btn btn--primary" id="copyMail" type="button">Copy email</button>
+            <a class="btn" href="mailto:Vincentsomido25@gmail.com">Open mail app</a>
+          </div>
+          <ul class="facts">
+            <li><span>Phone</span><a href="tel:09605154803">09605154803</a></li>
+            <li><span>Location</span>Antipolo City, Philippines</li>
+            <li><span>Availability</span>Freelance &amp; Part-time</li>
+          </ul>
+        </div>
+
+        <form class="card reveal" id="contactForm" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+          <input type="hidden" name="form-name" value="contact">
+          <p class="hp"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+          <div class="two">
+            <label>First name<input name="first_name" required autocomplete="given-name"></label>
+            <label>Last name<input name="last_name" required autocomplete="family-name"></label>
+          </div>
+          <label>Email address<input type="email" name="email" required autocomplete="email"></label>
+          <label>Subject<input name="subject" required></label>
+          <label>Message <span class="count" id="msgCount">0 / 800</span>
+            <textarea name="message" id="msg" rows="5" maxlength="800" required></textarea>
+          </label>
+          <button class="btn btn--primary" type="submit">Send message</button>
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer wrap">
+    <span>© <span id="year">2026</span> Vincent Brian Somido</span>
+    <a href="#top">Back to top ↑</a>
+  </footer>
+
+  <!-- Project modal -->
+  <dialog class="modal" id="projectModal" aria-labelledby="pmTitle">
+    <form method="dialog"><button class="icon-btn modal__x" aria-label="Close">✕</button></form>
+    <div id="pmBody"></div>
+  </dialog>
+
+  <!-- Command palette -->
+  <dialog class="modal palette" id="palette" aria-label="Command menu">
+    <input id="palInput" type="text" placeholder="Jump to a section or run an action…" autocomplete="off" aria-label="Search commands">
+    <ul id="palList" role="listbox"></ul>
+    <p class="palette__hint muted"><kbd>↑</kbd><kbd>↓</kbd> navigate · <kbd>↵</kbd> select · <kbd>esc</kbd> close</p>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="js/main.js"></script>
+</body>
+</html>
