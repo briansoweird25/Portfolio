@@ -84,7 +84,9 @@ main::before { content: ''; position: absolute; top: 0; right: 0; width: 360px; 
 .hero { display: grid; grid-template-columns: 288px 1fr; gap: 40px; align-items: start; }
 .portrait { position: relative; width: 288px; height: 288px; display: grid; place-items: center; overflow: hidden; background: var(--panel); border-radius: 4px; }
 .portrait::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, var(--text) 1.1px, transparent 1.6px) 0 0 / 7px 7px; -webkit-mask-image: radial-gradient(circle at 42% 35%, #000 10%, transparent 72%); mask-image: radial-gradient(circle at 42% 35%, #000 10%, transparent 72%); opacity: .8; }
-.portrait span { position: relative; font: 500 64px var(--mono); letter-spacing: -.05em; color: var(--text); mix-blend-mode: normal; text-shadow: 0 0 0 var(--bg), 0 0 18px var(--bg); }
+.portrait { align-items: end; }
+.portrait::before { opacity: .45; }
+.portrait img { position: relative; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; }
 .hero h1 { font: 400 clamp(32px, 4vw, 42px)/1.1 var(--mono); letter-spacing: -.03em; margin-bottom: 22px; }
 .hero__text p { color: #555; line-height: 2.1; }
 :root[data-theme="dark"] .hero__text p { color: #b5b5b5; }
