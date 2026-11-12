@@ -71,8 +71,8 @@ img{display:block;max-width:100%;height:auto}
 .footer-bottom{max-width:1400px;margin:0 auto;padding-top:30px;border-top:1px solid rgba(245,239,227,.1);display:flex;justify-content:space-between;font:400 11px var(--mono)}
 
 @media (max-width:900px){
-  .header-in{padding:0 20px}
-  .nav{display:none}
+  .header-in{padding:10px 20px;height:auto;min-height:70px;flex-wrap:wrap;row-gap:8px}
+  .nav{display:flex;order:3;width:100%;justify-content:center;gap:28px;font-size:10px;padding-top:9px;border-top:1px solid var(--line)}
   .page-hero{padding:60px 20px}
   .page-hero h1{font-size:42px}
   .story{grid-template-columns:1fr;gap:40px;padding:0 20px 60px}
@@ -95,9 +95,6 @@ img{display:block;max-width:100%;height:auto}
       <a href="contact.html">Contact</a>
     </nav>
     <div class="nav-right">
-      <button class="icon-btn" aria-label="Search">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      </button>
       <a href="shop.html" class="icon-btn" aria-label="Shopping bag">
         <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
       </a>
@@ -113,7 +110,7 @@ img{display:block;max-width:100%;height:auto}
 
   <section class="story">
     <div class="story-img">
-      <img src="https://images.unsplash.com/photo-1558769132-cb1aea1f1d79?w=800&q=80" alt="Fabric detail">
+      <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80" alt="Tailor at a sewing machine">
     </div>
     <div class="story-text">
       <h2>Our story</h2>
@@ -159,21 +156,21 @@ img{display:block;max-width:100%;height:auto}
     <h2>Materials</h2>
     <div class="material-grid">
       <div class="material-card">
-        <img src="https://images.unsplash.com/photo-1512980664150-e74de30b4eb2?w=600&q=80" alt="Wool fabric">
+        <img src="https://images.unsplash.com/photo-1584992236310-6edddc08acff?w=600&q=80" alt="Wool yarn">
         <div class="material-overlay">
           <h3>Italian Wool</h3>
           <p>Superfine merino and wool-cashmere from Biella mills</p>
         </div>
       </div>
       <div class="material-card">
-        <img src="https://images.unsplash.com/photo-1617110863026-8c29f1f56bb4?w=600&q=80" alt="Linen fabric">
+        <img src="https://images.unsplash.com/photo-1558171813-4c088753af8f?w=600&q=80" alt="Linen shirt on a stand">
         <div class="material-overlay">
           <h3>Belgian Linen</h3>
           <p>European flax, woven and finished in Belgium</p>
         </div>
       </div>
       <div class="material-card">
-        <img src="https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=600&q=80" alt="Silk fabric">
+        <img src="https://images.unsplash.com/photo-1520006403909-838d6b92c22e?w=600&q=80" alt="Silk scarves">
         <div class="material-overlay">
           <h3>Silk</h3>
           <p>Charmeuse and twill from Japanese and Italian weavers</p>
@@ -223,7 +220,7 @@ img{display:block;max-width:100%;height:auto}
   </div>
   <div class="footer-bottom">
     <p>© 2026 Lumière. A portfolio demo by Vincent Somido.</p>
-    <p>Images from Unsplash</p>
+    <p>Photography from Unsplash and Pexels</p>
   </div>
 </footer>
 

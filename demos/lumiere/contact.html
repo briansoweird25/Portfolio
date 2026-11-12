@@ -71,8 +71,8 @@ img{display:block;max-width:100%;height:auto}
 .footer-bottom{max-width:1400px;margin:0 auto;padding-top:30px;border-top:1px solid rgba(245,239,227,.1);display:flex;justify-content:space-between;font:400 11px var(--mono)}
 
 @media (max-width:900px){
-  .header-in{padding:0 20px}
-  .nav{display:none}
+  .header-in{padding:10px 20px;height:auto;min-height:70px;flex-wrap:wrap;row-gap:8px}
+  .nav{display:flex;order:3;width:100%;justify-content:center;gap:28px;font-size:10px;padding-top:9px;border-top:1px solid var(--line)}
   .contact-hero{padding:60px 20px 40px}
   .contact-hero h1{font-size:42px}
   .contact-grid{grid-template-columns:1fr;gap:40px;padding:0 20px 60px}
@@ -93,9 +93,6 @@ img{display:block;max-width:100%;height:auto}
       <a href="contact.html" class="active">Contact</a>
     </nav>
     <div class="nav-right">
-      <button class="icon-btn" aria-label="Search">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      </button>
       <a href="shop.html" class="icon-btn" aria-label="Shopping bag">
         <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
       </a>
@@ -206,7 +203,7 @@ img{display:block;max-width:100%;height:auto}
   </div>
   <div class="footer-bottom">
     <p>© 2026 Lumière. A portfolio demo by Vincent Somido.</p>
-    <p>Images from Unsplash</p>
+    <p>Photography from Unsplash and Pexels</p>
   </div>
 </footer>
 

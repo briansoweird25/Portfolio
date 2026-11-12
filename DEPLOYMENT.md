@@ -95,7 +95,7 @@ Once deployed, your demos will be accessible at:
 - ✅ Working filters (category) and sorting (price, name)
 - ✅ About page with brand story
 - ✅ Contact form with validation
-- ✅ Real Unsplash photography
+- ✅ Real Unsplash and Pexels photography
 - ✅ Fully responsive
 
 ### DevDash (Analytics Console)
@@ -141,7 +141,7 @@ Once deployed, your demos will be accessible at:
 - **No build process required** — All demos are static HTML/CSS/JS
 - **No dependencies** — Only Google Fonts externally loaded
 - **LocalStorage** — Used for persistence (gracefully degrades)
-- **Images** — Lumière uses Unsplash; other demos use inline SVG
+- **Images** — Lumière uses Unsplash and Pexels; other demos use inline SVG
 - **Browser support** — Modern browsers (Chrome, Firefox, Safari, Edge)
 - **Mobile-optimized** — All demos responsive with tested breakpoints
 
@@ -179,7 +179,7 @@ All demos are optimized for performance:
 - Lazy loading images where appropriate
 - Minimal CSS/JS (no frameworks)
 - Efficient DOM updates
-- No external API calls (except Unsplash images in Lumière)
+- No external API calls (except image CDN requests for Lumière)
 
 ## Security
 
@@ -202,13 +202,13 @@ These are **portfolio demonstrations**, not production applications:
 For issues or questions about deployment:
 - Check browser console for errors
 - Verify all file paths are correct
-- Ensure images load (check Unsplash availability)
+- Ensure images load (check Unsplash and Pexels availability)
 - Test in multiple browsers
 
 ## License
 
 This is a portfolio project by Vincent Somido.  
-Images in Lumière are from Unsplash and subject to [Unsplash License](https://unsplash.com/license).
+Images in Lumière are from Unsplash and Pexels, subject to their respective licenses.
 
 ---
 

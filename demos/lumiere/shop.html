@@ -27,7 +27,6 @@ img{display:block;max-width:100%;height:auto}
 .icon-btn{padding:8px;transition:opacity .2s;position:relative}
 .icon-btn:hover{opacity:.6}
 .icon-btn svg{width:18px;height:18px;stroke:var(--ink);stroke-width:1.5;fill:none}
-.bag-count{position:absolute;top:4px;right:4px;background:var(--accent);color:var(--paper);font:500 9px var(--mono);width:16px;height:16px;border-radius:50%;display:grid;place-items:center}
 
 /* Shop header */
 .shop-header{max-width:1400px;margin:0 auto;padding:40px 32px 30px;border-bottom:1px solid var(--line)}
@@ -39,6 +38,12 @@ img{display:block;max-width:100%;height:auto}
 .filter-btn:hover,.filter-btn.active{border-color:var(--ink);background:var(--ink);color:var(--paper)}
 .sort{font:400 11px var(--mono);color:var(--ink-light)}
 .sort select{font:inherit;padding:8px 12px;border:1px solid var(--line);background:var(--paper);cursor:pointer}
+.search-row{display:flex;gap:10px;margin-top:20px}
+.search-row[hidden]{display:none}
+.search-row input{flex:1;min-width:0;padding:11px 14px;border:1px solid var(--line);background:transparent;font:400 14px var(--serif);color:var(--ink)}
+.search-row input:focus{outline:none;border-color:var(--accent)}
+.search-row button{padding:10px 18px;font:400 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);background:transparent;transition:all .2s}
+.search-row button:hover{border-color:var(--ink);background:var(--ink);color:var(--paper)}
 
 /* Product grid */
 .products{max-width:1400px;margin:0 auto;padding:40px 32px 80px}
@@ -47,12 +52,12 @@ img{display:block;max-width:100%;height:auto}
 .product-img{aspect-ratio:3/4;background:#d8d0c2;overflow:hidden;margin-bottom:16px;position:relative}
 .product-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
 .product-card:hover .product-img img{transform:scale(1.05)}
-.quick-view{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);opacity:0;transition:opacity .3s;background:var(--paper);padding:10px 20px;font:500 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
-.product-card:hover .quick-view{opacity:1}
 .product-info h3{font:400 18px/1.3 var(--serif);margin-bottom:6px}
 .product-info .price{font:400 12px var(--mono);color:var(--ink-light)}
 .product-info .colors{display:flex;gap:6px;margin-top:8px}
 .color-dot{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}
+.empty-state{grid-column:1/-1;padding:60px 0;text-align:center;font-size:17px;color:var(--ink-light)}
+.empty-state button{margin-left:6px;font:400 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--ink);padding-bottom:2px}
 
 /* Footer */
 .footer{background:#1a1816;color:rgba(245,239,227,.6);padding:60px 32px 40px}
@@ -65,14 +70,17 @@ img{display:block;max-width:100%;height:auto}
 .footer-bottom{max-width:1400px;margin:0 auto;padding-top:30px;border-top:1px solid rgba(245,239,227,.1);display:flex;justify-content:space-between;font:400 11px var(--mono)}
 
 @media (max-width:900px){
-  .header-in{padding:0 20px}
-  .nav{display:none}
+  .header-in{padding:10px 20px;height:auto;min-height:70px;flex-wrap:wrap;row-gap:8px}
+  .nav{display:flex;order:3;width:100%;justify-content:center;gap:28px;font-size:10px;padding-top:9px;border-top:1px solid var(--line)}
   .shop-header{padding:30px 20px 20px}
   .shop-header h1{font-size:36px}
   .shop-controls{flex-direction:column;align-items:flex-start;gap:16px}
+  .filters{flex-wrap:wrap;gap:8px}
+  .filter-btn{padding:9px 14px}
   .products{padding:30px 20px 60px}
   .product-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:30px 16px}
   .footer-in{grid-template-columns:1fr 1fr;gap:30px}
+  .footer-bottom{flex-direction:column;gap:8px}
 }
 </style>
 </head>
@@ -87,12 +95,8 @@ img{display:block;max-width:100%;height:auto}
       <a href="contact.html">Contact</a>
     </nav>
     <div class="nav-right">
-      <button class="icon-btn" aria-label="Search">
+      <button class="icon-btn" id="searchToggle" aria-label="Search" aria-expanded="false" aria-controls="searchRow">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      </button>
-      <button class="icon-btn" aria-label="Shopping bag">
-        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        <span class="bag-count" id="bagCount" hidden>0</span>
       </button>
     </div>
   </div>
@@ -101,7 +105,7 @@ img{display:block;max-width:100%;height:auto}
 <main>
   <div class="shop-header">
     <h1>The collection</h1>
-    <p>24 pieces, made in small runs</p>
+    <p>20 pieces, made in small runs</p>
     <div class="shop-controls">
       <div class="filters">
         <button class="filter-btn active" data-filter="all">All</button>
@@ -109,6 +113,7 @@ img{display:block;max-width:100%;height:auto}
         <button class="filter-btn" data-filter="tops">Tops</button>
         <button class="filter-btn" data-filter="trousers">Trousers</button>
         <button class="filter-btn" data-filter="dresses">Dresses</button>
+        <button class="filter-btn" data-filter="skirts">Skirts</button>
       </div>
       <div class="sort">
         <label for="sortSelect">Sort by:</label>
@@ -119,6 +124,10 @@ img{display:block;max-width:100%;height:auto}
           <option value="name">Name</option>
         </select>
       </div>
+    </div>
+    <div class="search-row" id="searchRow" hidden>
+      <input type="search" id="searchInput" placeholder="Search by piece, fabric or category" aria-label="Search the collection">
+      <button type="button" id="searchClear">Clear</button>
     </div>
   </div>
 
@@ -169,50 +178,55 @@ img{display:block;max-width:100%;height:auto}
   </div>
   <div class="footer-bottom">
     <p>© 2026 Lumière. A portfolio demo by Vincent Somido.</p>
-    <p>Images from Unsplash</p>
+    <p>Photography from Unsplash and Pexels</p>
   </div>
 </footer>
 
 <script>
 const PRODUCTS = [
   {id:'belted-coat',name:'Belted Wool Coat',category:'Outerwear',price:890,img:'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=600&q=80',colors:['#c2a273','#3c3934']},
-  {id:'oversized-blazer',name:'Oversized Wool Blazer',category:'Outerwear',price:725,img:'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80',colors:['#31302c','#c2a273']},
-  {id:'trench-coat',name:'Double-Breasted Trench',category:'Outerwear',price:795,img:'https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=600&q=80',colors:['#b3aa9d','#3c3934']},
-  {id:'cashmere-coat',name:'Cashmere Wrap Coat',category:'Outerwear',price:1290,img:'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80',colors:['#d4c4a8','#687661']},
-  {id:'silk-shirt',name:'Silk Charmeuse Shirt',category:'Tops',price:425,img:'https://images.unsplash.com/photo-1564859228273-274232fdb516?w=600&q=80',colors:['#e6dcc9','#2f2c28']},
-  {id:'poplin-shirt',name:'Oversized Poplin Shirt',category:'Tops',price:295,img:'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80',colors:['#f1ece2','#a9b6bd']},
-  {id:'linen-shirt',name:'Relaxed Linen Shirt',category:'Tops',price:265,img:'https://images.unsplash.com/photo-1589992824616-f4e0b4b3e8f5?w=600&q=80',colors:['#d4c4a8','#687661']},
-  {id:'knit-top',name:'Fine Merino Knit Top',category:'Tops',price:185,img:'https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?w=600&q=80',colors:['#c2a273','#2f2c28']},
-  {id:'cashmere-crew',name:'Pure Cashmere Crew',category:'Tops',price:495,img:'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80',colors:['#d4c4a8','#687661']},
-  {id:'wool-turtleneck',name:'Wool Turtleneck',category:'Tops',price:225,img:'https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=600&q=80',colors:['#31302c','#b3aa9d']},
-  {id:'wide-leg-trouser',name:'Wide Leg Trouser',category:'Trousers',price:425,img:'https://images.unsplash.com/photo-1594633313593-bab3825d0caf?w=600&q=80',colors:['#b3aa9d','#31302c']},
-  {id:'pleated-trouser',name:'Pleated Wool Trouser',category:'Trousers',price:395,img:'https://images.unsplash.com/photo-1624206112431-4445e98d5624?w=600&q=80',colors:['#31302c','#c2a273']},
-  {id:'drawstring-pant',name:'Drawstring Linen Pant',category:'Trousers',price:295,img:'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&q=80',colors:['#d4c4a8','#f1ece2']},
-  {id:'slip-dress',name:'Silk Slip Dress',category:'Dresses',price:595,img:'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&q=80',colors:['#e6dcc9','#7a5a45']},
-  {id:'shirt-dress',name:'Poplin Shirt Dress',category:'Dresses',price:425,img:'https://images.unsplash.com/photo-1572804013427-4d7ca7268216?w=600&q=80',colors:['#f1ece2','#b3aa9d']},
-  {id:'knit-dress',name:'Merino Knit Dress',category:'Dresses',price:525,img:'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&q=80',colors:['#687661','#31302c']},
-  {id:'maxi-dress',name:'Linen Maxi Dress',category:'Dresses',price:395,img:'https://images.unsplash.com/photo-1612423284934-2850a4ea6b0f?w=600&q=80',colors:['#d4c4a8','#a9664a']},
-  {id:'bias-skirt',name:'Silk Bias Skirt',category:'Skirts',price:450,img:'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=600&q=80',colors:['#7a5a45','#2f2c28']},
-  {id:'pleated-skirt',name:'Pleated Midi Skirt',category:'Skirts',price:385,img:'https://images.unsplash.com/photo-1611312449408-fcece27cdbb7?w=600&q=80',colors:['#b3aa9d','#31302c']},
-  {id:'column-skirt',name:'Column Knit Skirt',category:'Skirts',price:325,img:'https://images.unsplash.com/photo-1599038784197-32d6c0e223a8?w=600&q=80',colors:['#687661','#d4c4a8']}
+  {id:'oversized-blazer',name:'Wool-Blend Bomber',category:'Outerwear',price:725,img:'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80',colors:['#a65f3f','#31302c']},
+  {id:'trench-coat',name:'Double-Breasted Trench',category:'Outerwear',price:795,img:'https://images.pexels.com/photos/19192235/pexels-photo-19192235.jpeg?auto=compress&cs=tinysrgb&w=800',colors:['#b3aa9d','#3c3934']},
+  {id:'cashmere-coat',name:'Cashmere Wrap Coat',category:'Outerwear',price:1290,img:'https://images.pexels.com/photos/35332621/pexels-photo-35332621.jpeg?auto=compress&cs=tinysrgb&w=800',colors:['#d4c4a8','#687661']},
+  {id:'silk-shirt',name:'Silk Charmeuse Shirt',category:'Tops',price:425,img:'https://images.pexels.com/photos/20636340/pexels-photo-20636340.jpeg?auto=compress&cs=tinysrgb&w=800',colors:['#6f8fa6','#2f2c28']},
+  {id:'poplin-shirt',name:'Chambray Oversized Shirt',category:'Tops',price:295,img:'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80',colors:['#a9b6bd','#f1ece2']},
+  {id:'linen-shirt',name:'Relaxed Linen Shirt',category:'Tops',price:265,img:'https://images.unsplash.com/photo-1558171813-4c088753af8f?w=600&q=80',colors:['#a9c0cc','#f1ece2']},
+  {id:'knit-top',name:'Fine Merino Knit Top',category:'Tops',price:185,img:'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=80',colors:['#c2a273','#f1ece2']},
+  {id:'cashmere-crew',name:'Pure Cashmere Crew',category:'Tops',price:495,img:'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80',colors:['#f1ece2','#d4c4a8']},
+  {id:'wool-turtleneck',name:'Merino Poncho',category:'Tops',price:225,img:'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80',colors:['#e6dcc9','#c2a273']},
+  {id:'wide-leg-trouser',name:'Wide Leg Trouser',category:'Trousers',price:425,img:'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?w=600&q=80',colors:['#c2b39a','#31302c']},
+  {id:'pleated-trouser',name:'Pleated Wool Trouser',category:'Trousers',price:395,img:'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&q=80',colors:['#31302c','#5a5550']},
+  {id:'drawstring-pant',name:'Drawstring Jersey Pant',category:'Trousers',price:295,img:'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&q=80',colors:['#d99f92','#f1ece2']},
+  {id:'slip-dress',name:'Silk Evening Gown',category:'Dresses',price:895,img:'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&q=80',colors:['#9e1f2d','#2f2c28']},
+  {id:'shirt-dress',name:'Poplin Shirt Dress',category:'Dresses',price:425,img:'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=600&q=80',colors:['#6b2434','#f1ece2']},
+  {id:'knit-dress',name:'Cotton Off-Shoulder Dress',category:'Dresses',price:525,img:'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&q=80',colors:['#f1ece2','#d4c4a8']},
+  {id:'maxi-dress',name:'Linen Maxi Dress',category:'Dresses',price:395,img:'https://images.unsplash.com/photo-1596783074918-c84cb06531ca?w=600&q=80',colors:['#e8a78e','#d4c4a8']},
+  {id:'bias-skirt',name:'Silk Bias Skirt',category:'Skirts',price:450,img:'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=600&q=80',colors:['#2f2c28','#7a5a45']},
+  {id:'pleated-skirt',name:'Pleated Mini Skirt',category:'Skirts',price:385,img:'https://images.unsplash.com/photo-1582142306909-195724d33ffc?w=600&q=80',colors:['#f1ece2','#31302c']},
+  {id:'column-skirt',name:'Tulle Midi Skirt',category:'Skirts',price:325,img:'https://images.unsplash.com/photo-1509551388413-e18d0ac5d495?w=600&q=80',colors:['#f1ece2','#d4c4a8']}
 ];
 
 let currentFilter = 'all';
 let currentSort = 'featured';
+let currentSearch = '';
 
 function renderProducts() {
   const grid = document.getElementById('productGrid');
-  let filtered = currentFilter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category.toLowerCase() === currentFilter);
+  let filtered = currentFilter === 'all' ? [...PRODUCTS] : PRODUCTS.filter(p => p.category.toLowerCase() === currentFilter);
+
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    filtered = filtered.filter(p => (p.name + ' ' + p.category).toLowerCase().includes(q));
+  }
   
   if (currentSort === 'price-low') filtered.sort((a,b) => a.price - b.price);
   else if (currentSort === 'price-high') filtered.sort((a,b) => b.price - a.price);
   else if (currentSort === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
   
-  grid.innerHTML = filtered.map(p => `
-    <a href="#" class="product-card" data-id="${p.id}">
+  grid.innerHTML = filtered.length ? filtered.map(p => `
+    <article class="product-card" data-id="${p.id}">
       <div class="product-img">
         <img src="${p.img}" alt="${p.name}" loading="lazy">
-        <span class="quick-view">Quick view</span>
       </div>
       <div class="product-info">
         <h3>${p.name}</h3>
@@ -221,8 +235,8 @@ function renderProducts() {
           ${p.colors.map(c => `<span class="color-dot" style="background:${c}"></span>`).join('')}
         </div>
       </div>
-    </a>
-  `).join('');
+    </article>
+  `).join('') : `<p class="empty-state">No pieces match that search. <button type="button" id="emptyReset">Clear filters</button></p>`;
 }
 
 document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -237,6 +251,39 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 document.getElementById('sortSelect').addEventListener('change', (e) => {
   currentSort = e.target.value;
   renderProducts();
+});
+
+const searchRow = document.getElementById('searchRow');
+const searchInput = document.getElementById('searchInput');
+const searchToggle = document.getElementById('searchToggle');
+
+searchToggle.addEventListener('click', () => {
+  const open = searchRow.hidden;
+  searchRow.hidden = !open;
+  searchToggle.setAttribute('aria-expanded', String(open));
+  if (open) searchInput.focus();
+});
+
+searchInput.addEventListener('input', () => {
+  currentSearch = searchInput.value.trim();
+  renderProducts();
+});
+
+document.getElementById('searchClear').addEventListener('click', () => {
+  searchInput.value = '';
+  currentSearch = '';
+  renderProducts();
+  searchInput.focus();
+});
+
+document.getElementById('productGrid').addEventListener('click', (e) => {
+  if (e.target.id === 'emptyReset') {
+    searchInput.value = '';
+    currentSearch = '';
+    currentFilter = 'all';
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
+    renderProducts();
+  }
 });
 
 renderProducts();

@@ -5,32 +5,28 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 
 ---
 
-## Demo 01: Lumière — Luxury Storefront
-**File:** `demos/lumiere.html`  
-**Description:** Editorial fashion storefront with curated filters, quick product views, shopping bag and simulated checkout.
+## Demo 01: Lumière — Multi-page Luxury Storefront
+**Files:** `demos/lumiere/index.html`, `shop.html`, `about.html`, `contact.html`  
+**Description:** Multi-page luxury fashion site with real photography, a 20-piece catalog, brand story and contact form.
 
 ### Features Delivered
-- 24 seed products across categories (Coats, Dresses, Knitwear, Shoes)
-- Filter by category, price range and availability
-- Real-time search across product names
-- Sort by newest, price (low/high), name
-- Quick view modal with detailed product info
-- Persistent shopping bag (localStorage)
-- Working checkout flow with validation
-- Newsletter signup with validation
-- Fully responsive (mobile drawer, desktop grid)
+- Four linked pages: home, shop, about, contact
+- 20-piece catalog photographed from Unsplash and Pexels
+- Category filters (including skirts), live search and sorting
+- Responsive navigation on desktop and mobile
+- Contact form with validation and simulated response
+- Shared editorial design system across every page
 
 ### Technical Notes
-- Custom SVG product illustrations with palette system
-- Smooth cart drawer with item management
-- All state persisted to localStorage (`lumiere_cart_v1`)
+- Static HTML/CSS/JavaScript with no build step
+- Unsplash and Pexels photography served from their image CDNs
+- Tested desktop 1440×1000 and mobile 390×844
 - Zero console errors, no horizontal overflow
-- Tested: desktop 1440×1000, mobile 390×844
 
 ---
 
 ## Demo 02: DevDash — Analytics Console
-**File:** `demos/devdash.html`  
+**File:** `demos/devdash/index.html`  
 **Description:** Responsive analytics dashboard with custom charts, sortable tables and CSV export.
 
 ### Features Delivered
@@ -55,7 +51,7 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 ---
 
 ## Demo 03: Taskly — Kanban Board
-**File:** `demos/taskly.html`  
+**File:** `demos/taskly/index.html`  
 **Description:** Local-first kanban board with drag-and-drop, inline editing and keyboard shortcuts.
 
 ### Features Delivered
@@ -82,7 +78,7 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 ---
 
 ## Demo 04: ShopManager — Inventory System
-**File:** `demos/shopmanager.html`  
+**File:** `demos/shopmanager/index.html`  
 **Description:** Studio inventory ledger with CRUD operations, restocking and reporting.
 
 ### Features Delivered
@@ -109,7 +105,7 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 ---
 
 ## Demo 05: Aura — Scent Finder
-**File:** `demos/aura.html`  
+**File:** `demos/aura/index.html`  
 **Description:** On-device fragrance finder with natural language queries, no API calls.
 
 ### Features Delivered
@@ -135,7 +131,7 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 ---
 
 ## Demo 06: Listed — Product Copy Studio
-**File:** `demos/product-lister.html`  
+**File:** `demos/listed/index.html`  
 **Description:** Product copy workspace for fashion e-commerce with live readiness scoring.
 
 ### Features Delivered
@@ -230,21 +226,25 @@ Portfolio-claude-gracious-ritchie-op5u93/
 ├── js/
 │   └── main.js
 └── demos/
-    ├── lumiere.html          (24 products, cart, checkout)
-    ├── devdash.html          (charts, tables, dark mode)
-    ├── taskly.html           (kanban, drag-drop, 11 tasks)
-    ├── shopmanager.html      (18 products, CRUD, restock)
-    ├── aura.html             (16 scents, NL search, compare)
-    └── product-lister.html   (4 products, live preview, scoring)
+    ├── lumiere/              (4 pages, 20 products, search/filters)
+    │   ├── index.html
+    │   ├── shop.html
+    │   ├── about.html
+    │   └── contact.html
+    ├── devdash/index.html    (charts, tables, dark mode)
+    ├── taskly/index.html     (kanban, drag-drop, 11 tasks)
+    ├── shopmanager/index.html (18 products, CRUD, restock)
+    ├── aura/index.html       (16 scents, NL search, compare)
+    └── listed/index.html     (4 products, live preview, scoring)
 ```
 
 ---
 
 ## Deployment Notes
-- All demos are self-contained single HTML files
+- All demos are static HTML/CSS/JavaScript
 - No build process required
-- No external dependencies except Google Fonts
-- All JavaScript is inline, all CSS is inline
+- No external dependencies except Google Fonts and Lumière photography
+- All demo JavaScript and CSS are inline
 - LocalStorage used for persistence (gracefully degrades if unavailable)
 - Ready for Netlify drag-and-drop deployment
 - All paths are relative, work from any directory
