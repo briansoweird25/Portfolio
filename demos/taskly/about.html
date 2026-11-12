@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About — Taskly</title>
+<meta name="description" content="About the Taskly kanban board demo.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2329251f'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' fill='none' stroke='%23f4f1e8' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f4f1e8;--paper-2:#ece8dd;--card:#fffdf8;--ink:#29251f;--muted:#7c7466;--line:#ddd5c6;--line-2:#c9bfae;--accent:#29251f;--accent-2:#b3543f;--ok:#3f6b50;--danger:#a94331;--font:'Bricolage Grotesque','Helvetica Neue',Arial,sans-serif;--mono:'Spline Sans Mono',ui-monospace,Menlo,Consolas,monospace;--ease:cubic-bezier(.16,1,.3,1)}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 13px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+body.nav-open{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+h1,h2,h3,p{margin:0;padding:0}
+svg{display:block}
+:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:5px;z-index:100;font:500 10px var(--mono)}
+.skip:focus{left:8px}
+
+.appbar{flex:none;position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:18px;height:60px;padding:0 24px;background:color-mix(in srgb,var(--paper) 91%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;font:700 19px/1 var(--font);letter-spacing:-.03em}
+.brand-mark{width:27px;height:27px;border-radius:7px;background:var(--ink);display:grid;place-items:center;flex:none;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
+.brand-mark svg{width:14px;height:14px;fill:none;stroke:var(--paper);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.app-actions{display:flex;align-items:center;gap:7px}
+.saved-note{display:inline-flex;align-items:center;gap:6px;font:500 8px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.icon-btn{display:grid;place-items:center;width:32px;height:32px;border:1px solid transparent;border-radius:6px;background:none;color:var(--muted);transition:all .2s}
+.icon-btn:hover{background:var(--card);border-color:var(--line);color:var(--ink)}
+.icon-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.menu-btn{display:none}
+
+.main{flex:1;min-height:0;display:flex;flex-direction:column;max-width:900px;margin:0 auto;padding:32px 24px 40px;width:100%}
+.page-head{margin-bottom:32px}
+.kicker{display:flex;align-items:center;gap:7px;font:500 8px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--accent-2)}
+.kicker::before{content:'';width:13px;height:1px;background:currentColor}
+.page-head h1{font:600 clamp(28px,4vw,38px)/1.1 var(--font);letter-spacing:-.035em;margin:8px 0 12px}
+.page-head .sub{font-size:14px;color:var(--muted);max-width:60ch;line-height:1.6}
+
+.section{margin-top:36px}
+.section h2{font:600 17px/1.3 var(--font);margin-bottom:14px}
+.features{display:grid;gap:12px}
+.feature{display:flex;gap:12px;padding:14px;border:1px solid var(--line);border-radius:7px;background:var(--card)}
+.feature-icon{width:32px;height:32px;flex:none;display:grid;place-items:center;background:color-mix(in srgb,var(--accent-2) 12%,transparent);border-radius:6px}
+.feature-icon svg{width:16px;height:16px;stroke:var(--accent-2);fill:none;stroke-width:1.6}
+.feature h3{font:500 13px/1.3 var(--font);margin-bottom:3px}
+.feature p{font-size:12px;color:var(--muted);line-height:1.5}
+
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:10px}
+.tech-item{display:flex;align-items:center;gap:7px;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:5px}
+.tech-dot{width:7px;height:7px;border-radius:50%;background:var(--accent-2)}
+.tech-item span{font:500 10px/1.3 var(--font)}
+
+.data-note{margin-top:28px;padding:14px;background:var(--paper-2);border-radius:6px;border-left:3px solid var(--accent-2)}
+.data-note p{font-size:12px;color:var(--muted);line-height:1.6}
+
+footer{padding:20px 24px;border-top:1px solid var(--line);text-align:center;font:400 11px/1.5 var(--mono);color:var(--muted)}
+.footer-links{display:flex;justify-content:center;gap:20px;margin-top:8px}
+.footer-links a{transition:color .2s}
+.footer-links a:hover{color:var(--ink)}
+
+@media (max-width:900px){
+  .appbar{padding:0 16px}
+  .menu-btn{display:grid;place-items:center;width:36px;height:36px;background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted)}
+  .menu-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.6}
+  .main{padding:24px 16px 32px}
+  .features{grid-template-columns:1fr}
+  .tech-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Skip to main content</a>
+
+<header class="appbar">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24"><path d="M9 16.5l4.5 4.5L23 11" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      Taskly
+    </a>
+  </div>
+  <div class="app-actions">
+    <a href="index.html" class="btn">Open board</a>
+  </div>
+</header>
+
+<main class="main" id="main">
+  <div class="page-head">
+    <div class="kicker">About</div>
+    <h1>Taskly Kanban</h1>
+    <p class="sub">A calm, focused kanban board for managing tasks with drag-and-drop, filtering, and local persistence. Built entirely with vanilla HTML, CSS, and JavaScript.</p>
+  </div>
+
+  <section class="section">
+    <h2>Features</h2>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 3v18M3 9h18" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div>
+          <h3>Drag and Drop</h3>
+          <p>Move tasks between columns with intuitive drag-and-drop. Visual feedback shows drop zones.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div>
+          <h3>Inline Editing</h3>
+          <p>Click any task to edit its title, description, labels, and due date directly on the card.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <h3>Label Filters</h3>
+          <p>Filter tasks by labels like design, feature, bug, or urgent. Combine with search for precise results.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <h3>JSON Export</h3>
+          <p>Export your entire board to JSON for backup or migration. Restore from exported files.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div>
+          <h3>Keyboard Navigation</h3>
+          <p>Press N for new task, arrow keys to navigate, Enter to edit. Full keyboard accessibility.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div>
+          <h3>Local Persistence</h3>
+          <p>All data saved to localStorage automatically. Your board persists across sessions and tabs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Technical Details</h2>
+    <div class="tech-grid">
+      <div class="tech-item"><span class="tech-dot"></span><span>Vanilla JS</span></div>
+      <div class="tech-item"><span class="tech-dot"></span><span>Drag & Drop API</span></div>
+      <div class="tech-item"><span class="tech-dot"></span><span>CSS Grid</span></div>
+      <div class="tech-item"><span class="tech-dot"></span><span>LocalStorage</span></div>
+      <div class="tech-item"><span class="tech-dot"></span><span>Keyboard Events</span></div>
+      <div class="tech-item"><span class="tech-dot"></span><span>No Dependencies</span></div>
+    </div>
+  </section>
+
+  <div class="data-note">
+    <p><strong>Demo Board:</strong> This is a demonstration board with sample tasks. Your changes are saved locally but will be cleared if you clear your browser data.</p>
+  </div>
+</main>
+
+<footer>
+  <span>Taskly — A portfolio demo by Vincent Somido</span>
+  <div class="footer-links">
+    <a href="index.html">Board</a>
+    <a href="about.html">About</a>
+  </div>
+</footer>
+</body>
+</html>

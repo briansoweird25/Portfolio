@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About — Listed</title>
+<meta name="description" content="About the Listed product copy studio demo.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232c3e50'/%3E%3Cpath d='M8 10h16M8 16h12M8 22h8' stroke='%23ecf0f1' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf9f7;--surface:#fff;--surface-2:#f5f4f2;--text:#2c3e50;--muted:#7f8c8d;--line:#e5e4e1;--line-2:#cecac5;--accent:#2c3e50;--accent-soft:#e8eaeb;--ok:#27ae60;--serif:'Literata',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--mono:'JetBrains Mono',monospace}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:400 14px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+body.nav-open{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+h1,h2,h3,p{margin:0;padding:0}
+svg{display:block}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:-999px;top:8px;background:var(--accent);color:#fff;padding:8px 14px;border-radius:4px;z-index:100;font:500 11px var(--mono)}
+.skip:focus{left:8px}
+
+.topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px;padding:0 24px;background:rgba(250,249,247,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font:600 22px/1 var(--sans);letter-spacing:-.02em}
+.brand-icon{width:32px;height:32px;background:var(--accent);border-radius:6px;display:grid;place-items:center}
+.brand-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
+.top-actions{display:flex;align-items:center;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--text);font:500 10px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;transition:all .2s}
+.btn:hover{background:var(--surface-2);border-color:var(--line-2)}
+.btn svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8}
+.icon-btn{display:grid;place-items:center;width:36px;height:36px;border:1px solid transparent;border-radius:6px;background:none;color:var(--muted);transition:all .2s}
+.icon-btn:hover{background:var(--surface);border-color:var(--line);color:var(--text)}
+.icon-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6}
+.menu-btn{display:none}
+
+.main{max-width:880px;margin:0 auto;padding:40px 24px 48px}
+.page-head{margin-bottom:36px}
+.kicker{display:flex;align-items:center;gap:8px;font:500 8px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.kicker::before{content:'';width:14px;height:2px;background:currentColor}
+.page-head h1{font:600 clamp(32px,4vw,44px)/1.1 var(--serif);letter-spacing:-.02em;margin:10px 0 14px}
+.page-head .sub{font-size:15px;color:var(--muted);max-width:58ch;line-height:1.65}
+
+.section{margin-top:40px}
+.section h2{font:600 18px/1.35 var(--sans);margin-bottom:16px}
+.features{display:grid;gap:14px}
+.feature{display:flex;gap:14px;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.feature-icon{width:38px;height:38px;flex:none;display:grid;place-items:center;background:var(--accent-soft);border-radius:8px}
+.feature-icon svg{width:17px;height:17px;stroke:var(--accent);fill:none;stroke-width:1.5}
+.feature h3{font:500 14px/1.3 var(--sans);margin-bottom:4px}
+.feature p{font-size:13px;color:var(--muted);line-height:1.55}
+
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
+.tech-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.tech-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.tech-item span{font:500 10px/1.3 var(--sans)}
+
+.data-note{margin-top:32px;padding:16px;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--accent)}
+.data-note p{font-size:13px;color:var(--muted);line-height:1.6}
+
+footer{padding:24px 24px;border-top:1px solid var(--line);text-align:center;font:400 11px/1.5 var(--mono);color:var(--muted)}
+.footer-links{display:flex;justify-content:center;gap:22px;margin-top:10px}
+.footer-links a{transition:color .2s}
+.footer-links a:hover{color:var(--text)}
+
+@media (max-width:900px){
+  .topbar{padding:0 16px}
+  .menu-btn{display:grid;place-items:center;width:36px;height:36px;background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted)}
+  .menu-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.6}
+  .main{padding:28px 16px 36px}
+  .features{grid-template-columns:1fr}
+  .tech-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Skip to main content</a>
+
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="index.html" class="brand">
+      <span class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h12M4 18h8" stroke-linecap="round"/></svg>
+      </span>
+      Listed
+    </a>
+  </div>
+  <div class="top-actions">
+    <a href="index.html" class="btn">Open studio</a>
+  </div>
+</header>
+
+<main class="main" id="main">
+  <div class="page-head">
+    <div class="kicker">About</div>
+    <h1>Product Copy Studio</h1>
+    <p class="sub">A workspace for crafting compelling product listings with benefit-led descriptions, SEO optimization, and real-time readiness scoring.</p>
+  </div>
+
+  <section class="section">
+    <h2>Features</h2>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div>
+          <h3>Live Editor</h3>
+          <p>Edit title, description, and bullet points with instant preview. See changes reflected in real-time.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M22 4L12 14.01l-3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <h3>Readiness Scoring</h3>
+          <p>Real-time score from 0-100 based on title length, description completeness, bullet points, and SEO elements.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div>
+          <h3>SEO Optimization</h3>
+          <p>Generate search-friendly titles and meta descriptions. Preview how listings appear in search results.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div>
+          <h3>Clipboard Copy</h3>
+          <p>One-click copy to clipboard for title, description, or bullet points. Paste directly into your platform.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h18M9 21V9" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div>
+          <h3>Product Rack</h3>
+          <p>Manage multiple products in a rack. Switch between items, add new products, and see your average score.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <h3>Local Storage</h3>
+          <p>All work saves automatically to localStorage. Your listings persist across sessions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Technical Details</h2>
+    <div class="tech-grid">
+      <div class="tech-item"><span class="tech-dot"></span><span>Vanilla JS</span></div>
+      <div class="tech-item"><span class="tech-dot"></span><span>DOM Updates</span></div>
+      <div class="tech-item"><span class="tech-dot"></span><span>CSS Variables</span></div>
+      <div class="tech-item"><span class="tech-dot"></span><span>LocalStorage</span></div>
+      <div class="tech-item"><span class="tech-dot"></span><span>Clipboard API</span></div>
+      <div class="tech-item"><span class="tech-dot"></span><span>No Frameworks</span></div>
+    </div>
+  </section>
+
+  <div class="data-note">
+    <p><strong>Demo Products:</strong> Sample fashion items with placeholder listings. Your edits are saved locally but can be reset to default.</p>
+  </div>
+</main>
+
+<footer>
+  <span>Listed — A portfolio demo by Vincent Somido</span>
+  <div class="footer-links">
+    <a href="index.html">Studio</a>
+    <a href="about.html">About</a>
+  </div>
+</footer>
+</body>
+</html>

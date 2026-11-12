@@ -26,7 +26,7 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 ---
 
 ## Demo 02: DevDash — Analytics Console
-**File:** `demos/devdash/index.html`  
+**Pages:** `demos/devdash/index.html`, `demos/devdash/about.html`  
 **Description:** Responsive analytics dashboard with custom charts, sortable tables and CSV export.
 
 ### Features Delivered
@@ -40,6 +40,7 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 - CSV export for orders
 - Mobile sidebar with overlay
 - Search across orders
+- About page with feature overview
 
 ### Technical Notes
 - Hand-coded SVG charts (no libraries)
@@ -51,7 +52,7 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 ---
 
 ## Demo 03: Taskly — Kanban Board
-**File:** `demos/taskly/index.html`  
+**Pages:** `demos/taskly/index.html`, `demos/taskly/about.html`  
 **Description:** Local-first kanban board with drag-and-drop, inline editing and keyboard shortcuts.
 
 ### Features Delivered
@@ -67,6 +68,7 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 - JSON export of board state
 - Reset with confirmation
 - Keyboard shortcuts (N for new task, / for search)
+- About page with feature overview
 
 ### Technical Notes
 - localStorage key: `taskly_board_v1`
@@ -78,7 +80,7 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 ---
 
 ## Demo 04: ShopManager — Inventory System
-**File:** `demos/shopmanager/index.html`  
+**Pages:** `demos/shopmanager/index.html`, `demos/shopmanager/about.html`  
 **Description:** Studio inventory ledger with CRUD operations, restocking and reporting.
 
 ### Features Delivered
@@ -101,11 +103,12 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 - Custom category color system
 - Toast with undo for restock operations
 - Mobile card grid layout
+- About page with feature overview
 
 ---
 
 ## Demo 05: Aura — Scent Finder
-**File:** `demos/aura/index.html`  
+**Pages:** `demos/aura/index.html`, `demos/aura/about.html`  
 **Description:** On-device fragrance finder with natural language queries, no API calls.
 
 ### Features Delivered
@@ -120,6 +123,7 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 - Query examples as prompt buttons
 - Reset and clear controls
 - Fully responsive with mobile drawer
+- About page with feature overview
 
 ### Technical Notes
 - localStorage key: `aura_shelf_v1`
@@ -131,7 +135,7 @@ Six polished, self-contained live demos built for Vincent's portfolio, plus full
 ---
 
 ## Demo 06: Listed — Product Copy Studio
-**File:** `demos/listed/index.html`  
+**Pages:** `demos/listed/index.html`, `demos/listed/about.html`  
 **Description:** Product copy workspace for fashion e-commerce with live readiness scoring.
 
 ### Features Delivered
@@ -231,11 +235,21 @@ Portfolio-claude-gracious-ritchie-op5u93/
     │   ├── shop.html
     │   ├── about.html
     │   └── contact.html
-    ├── devdash/index.html    (charts, tables, dark mode)
-    ├── taskly/index.html     (kanban, drag-drop, 11 tasks)
-    ├── shopmanager/index.html (18 products, CRUD, restock)
-    ├── aura/index.html       (16 scents, NL search, compare)
-    └── listed/index.html     (4 products, live preview, scoring)
+    ├── devdash/              (dashboard + about)
+    │   ├── index.html
+    │   └── about.html
+    ├── taskly/               (kanban + about)
+    │   ├── index.html
+    │   └── about.html
+    ├── shopmanager/          (inventory + about)
+    │   ├── index.html
+    │   └── about.html
+    ├── aura/                 (scent finder + about)
+    │   ├── index.html
+    │   └── about.html
+    └── listed/               (copy studio + about)
+        ├── index.html
+        └── about.html
 ```
 
 ---

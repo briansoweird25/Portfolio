@@ -19,15 +19,20 @@ Portfolio-claude-gracious-ritchie-op5u93/
     │   ├── about.html       # Brand story
     │   └── contact.html     # Contact form
     ├── devdash/             # Analytics dashboard
-    │   └── index.html
+    │   ├── index.html
+    │   └── about.html
     ├── taskly/              # Kanban board
-    │   └── index.html
+    │   ├── index.html
+    │   └── about.html
     ├── shopmanager/         # Inventory system
-    │   └── index.html
+    │   ├── index.html
+    │   └── about.html
     ├── aura/                # Scent finder
-    │   └── index.html
+    │   ├── index.html
+    │   └── about.html
     └── listed/              # Product copy studio
-        └── index.html
+        ├── index.html
+        └── about.html
 ```
 
 ## Deployment Instructions
@@ -104,6 +109,7 @@ Once deployed, your demos will be accessible at:
 - ✅ Dark/light theme toggle
 - ✅ CSV export functionality
 - ✅ Mobile sidebar
+- ✅ Dedicated about page
 
 ### Taskly (Kanban Board)
 - ✅ Drag-and-drop tasks
@@ -113,6 +119,7 @@ Once deployed, your demos will be accessible at:
 - ✅ JSON export
 - ✅ Undo on delete
 - ✅ LocalStorage persistence
+- ✅ Dedicated about page
 
 ### ShopManager (Inventory System)
 - ✅ Full CRUD operations
@@ -121,6 +128,7 @@ Once deployed, your demos will be accessible at:
 - ✅ Reorder queue
 - ✅ CSV export
 - ✅ Live preview cards
+- ✅ Dedicated about page
 
 ### Aura (Scent Finder)
 - ✅ Natural language queries
@@ -128,6 +136,7 @@ Once deployed, your demos will be accessible at:
 - ✅ Save to shelf
 - ✅ Side-by-side comparison
 - ✅ 16 fragrance database
+- ✅ Dedicated about page
 
 ### Listed (Product Copy Studio)
 - ✅ Live editing workspace
@@ -135,6 +144,7 @@ Once deployed, your demos will be accessible at:
 - ✅ Live storefront preview
 - ✅ Copy/download functionality
 - ✅ Auto-save to localStorage
+- ✅ Dedicated about page
 
 ## Technical Notes
 
