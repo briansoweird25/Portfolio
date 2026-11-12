@@ -11,7 +11,7 @@
   var PROJECTS = [
     { n: '01', cat: 'E-Commerce · Multi-page demo', title: 'Lumière — Luxury Fashion',
       blurb: 'A multi-page luxury fashion website with real product photography, working shop with filters and sorting, brand story, and contact form.',
-      tags: ['HTML', 'CSS', 'JavaScript', 'Unsplash API'], demo: 'demos/lumiere/index.html' },
+      tags: ['HTML', 'CSS', 'JavaScript', 'Responsive'], demo: 'demos/lumiere/index.html' },
     { n: '02', cat: 'Dashboard · Interactive demo', title: 'DevDash — Analytics UI',
       blurb: 'A responsive analytics console with custom SVG revenue charts, sortable orders, CSV export and a working theme switch.',
       tags: ['HTML', 'CSS', 'JavaScript', 'SVG'], demo: 'demos/devdash/index.html' },
