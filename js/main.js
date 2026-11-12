@@ -9,24 +9,24 @@
   var FIGMA = 'https://www.figma.com/design/KcfBr5rP8VCogzmRrIuXcB/Untitled?node-id=0-1&t=f7EvUwokFbCWzGDb-1';
 
   var PROJECTS = [
-    { n: '01', cat: 'E-Commerce · Full-Stack', title: 'Lumière — Luxury Store',
-      blurb: 'A minimal, Apple-inspired online store with product grid, smooth cart drawer, and Stripe checkout integration.',
-      tags: ['Next.js', 'TypeScript', 'Tailwind', 'Stripe'] },
-    { n: '02', cat: 'Dashboard · SaaS', title: 'DevDash — Analytics UI',
-      blurb: 'A SaaS-style admin dashboard with live charts, user tables, dark mode, and role-based views.',
-      tags: ['React', 'Recharts', 'shadcn/ui', 'TypeScript'] },
-    { n: '03', cat: 'Full-Stack · Real-Time', title: 'Taskly — Kanban Board',
-      blurb: 'Drag-and-drop task manager with real-time sync, user auth, and team collaboration features.',
-      tags: ['Next.js', 'Prisma', 'PostgreSQL', 'Supabase'] },
-    { n: '04', cat: 'PHP · MySQL', title: 'ShopManager — CRUD System',
-      blurb: 'A product management system with inventory tracking, user roles, and reporting built with PHP and MySQL.',
-      tags: ['PHP', 'MySQL', 'HTML/CSS', 'Bootstrap'] },
-    { n: '05', cat: 'AI Feature · Modern', title: 'Aura — AI Recommender',
-      blurb: 'An AI-powered product recommendation engine where users describe what they want in plain text and get curated results.',
-      tags: ['Next.js', 'OpenAI API', 'TypeScript', 'Vercel'] },
-    { n: '06', cat: 'E-Commerce · Real Work', title: 'Product Lister — E-Commerce',
-      blurb: 'Real work experience listing fashion products on e-commerce platforms. Wrote compelling product descriptions, size charts, and sales copy that drove conversions.',
-      tags: ['Product Listing', 'Copywriting', 'E-Commerce', 'SEO'],
+    { n: '01', cat: 'E-Commerce · Multi-page demo', title: 'Lumière — Luxury Fashion',
+      blurb: 'A multi-page luxury fashion website with real product photography, working shop with filters and sorting, brand story, and contact form.',
+      tags: ['HTML', 'CSS', 'JavaScript', 'Unsplash API'], demo: 'demos/lumiere/index.html' },
+    { n: '02', cat: 'Dashboard · Interactive demo', title: 'DevDash — Analytics UI',
+      blurb: 'A responsive analytics console with custom SVG revenue charts, sortable orders, CSV export and a working theme switch.',
+      tags: ['HTML', 'CSS', 'JavaScript', 'SVG'], demo: 'demos/devdash/index.html' },
+    { n: '03', cat: 'Productivity · Interactive demo', title: 'Taskly — Kanban Board',
+      blurb: 'A local-first kanban board with drag-and-drop, inline editing, label filters, JSON export and a keyboard-friendly flow.',
+      tags: ['HTML', 'CSS', 'JavaScript', 'LocalStorage'], demo: 'demos/taskly/index.html' },
+    { n: '04', cat: 'Inventory · Interactive demo', title: 'ShopManager — Inventory System',
+      blurb: 'A studio inventory ledger with search, filters, restocking, a reorder queue, reporting and CSV export.',
+      tags: ['HTML', 'CSS', 'JavaScript', 'CRUD UI'], demo: 'demos/shopmanager/index.html' },
+    { n: '05', cat: 'Product finder · On-device demo', title: 'Aura — Scent Finder',
+      blurb: 'Describe a mood, note or budget in plain language and Aura ranks sixteen fragrances entirely in the browser — no API calls.',
+      tags: ['HTML', 'CSS', 'JavaScript', 'Local data'], demo: 'demos/aura/index.html' },
+    { n: '06', cat: 'E-Commerce · Copywriting', title: 'Listed — Product Copy Studio',
+      blurb: 'A product copy workspace built from real fashion listing work: benefit-led descriptions, fabric and size details, search metadata and a live readiness check.',
+      tags: ['Product Listing', 'Copywriting', 'SEO', 'HTML/CSS/JS'], demo: 'demos/listed/index.html',
       samples: [
         { h: 'Lina – Summer jacket in linen', p: 'Pair effortlessly with summer pants or dresses for a stylish look. Timeless color options that shine.',
           l: ['Looks great with any outfit', 'Colors that shine', 'Complements your style'] },
@@ -84,7 +84,12 @@
     b.appendChild(el('h3', null, p.title));
     b.appendChild(el('p', null, p.blurb));
     b.appendChild(tagList(p.tags));
-    b.appendChild(el('span', 'more', 'View details →'));
+    if (p.demo) {
+      var demoTag = el('span', 'more', 'Open demo →');
+      b.appendChild(demoTag);
+    } else {
+      b.appendChild(el('span', 'more', 'View details →'));
+    }
     b.addEventListener('click', function () {
       if (i === idx) { openProject(i); } else { idx = i; layout(); }
     });
@@ -145,12 +150,18 @@
       d.appendChild(ul);
       w.appendChild(d);
     });
-    if (p.link) {
-      var act = el('div', 'actions');
-      var a = el('a', 'btn btn--primary', p.linkLabel + ' ↗');
-      a.href = p.link; a.target = '_blank'; a.rel = 'noopener noreferrer';
-      act.appendChild(a); w.appendChild(act);
+    var act = el('div', 'actions');
+    if (p.demo) {
+      var demoLink = el('a', 'btn btn--primary', 'Open live demo ↗');
+      demoLink.href = p.demo; demoLink.target = '_blank'; demoLink.rel = 'noopener noreferrer';
+      act.appendChild(demoLink);
     }
+    if (p.link) {
+      var a = el('a', 'btn', p.linkLabel + ' ↗');
+      a.href = p.link; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      act.appendChild(a);
+    }
+    if (act.childNodes.length) w.appendChild(act);
     body.appendChild(w);
     modal.showModal();
   }

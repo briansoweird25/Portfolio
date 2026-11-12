@@ -1,0 +1,907 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taskly — A calm kanban board</title>
+<meta name="description" content="Taskly is a drag-and-drop kanban board demo with task editing, labels, due dates, search and local persistence. Plain HTML, CSS and JavaScript.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2329251f'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' fill='none' stroke='%23f4f1e8' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f4f1e8;--paper-2:#ece8dd;--card:#fffdf8;--ink:#29251f;--muted:#7c7466;--line:#ddd5c6;--line-2:#c9bfae;--accent:#29251f;--accent-2:#b3543f;--ok:#3f6b50;--danger:#a94331;--font:'Bricolage Grotesque','Helvetica Neue',Arial,sans-serif;--mono:'Spline Sans Mono',ui-monospace,Menlo,Consolas,monospace;--ease:cubic-bezier(.16,1,.3,1)}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;height:100dvh;display:flex;flex-direction:column;overflow:hidden;background:var(--paper);color:var(--ink);font:400 13px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+body.locked{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3,p,ol,ul{margin:0;padding:0}
+ul,ol{list-style:none}
+svg{display:block}
+:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:5px;z-index:100;font:500 10px var(--mono)}
+.skip:focus{left:8px}
+
+/* App bar */
+.appbar{flex:none;position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:18px;height:60px;padding:0 24px;background:color-mix(in srgb,var(--paper) 91%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;font:700 19px/1 var(--font);letter-spacing:-.03em}
+.brand-mark{width:27px;height:27px;border-radius:7px;background:var(--ink);display:grid;place-items:center;flex:none;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
+.brand-mark svg{width:14px;height:14px;fill:none;stroke:var(--paper);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.app-actions{display:flex;align-items:center;gap:7px}
+.saved-note{display:inline-flex;align-items:center;gap:6px;margin-right:8px;font:500 8px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.saved-note i{width:5px;height:5px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(63,107,80,.12)}
+.saved-note.flash i{animation:savedPulse .7s var(--ease)}
+@keyframes savedPulse{0%{transform:scale(1)}40%{transform:scale(1.8);box-shadow:0 0 0 5px rgba(63,107,80,.14)}100%{transform:scale(1)}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border:1px solid var(--line-2);border-radius:6px;background:var(--card);color:var(--ink);font:500 9px/1.2 var(--mono);letter-spacing:.05em;text-transform:uppercase;transition:background .2s,border-color .2s,transform .2s,color .2s;white-space:nowrap}
+.btn:hover{background:var(--paper);border-color:var(--ink);transform:translateY(-1px)}
+.btn svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.btn--primary{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.btn--primary:hover{background:var(--accent-2);border-color:var(--accent-2);color:#fff}
+.btn--danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 32%,var(--line))}
+.btn--danger:hover{background:color-mix(in srgb,var(--danger) 8%,var(--card));border-color:var(--danger)}
+.btn[hidden]{display:none}
+.menu-wrap{position:relative}
+.icon-btn{display:grid;place-items:center;width:32px;height:32px;border:1px solid transparent;border-radius:6px;background:none;color:var(--muted);transition:all .2s}
+.icon-btn:hover{background:var(--card);border-color:var(--line);color:var(--ink)}
+.icon-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.menu{position:absolute;right:0;top:calc(100% + 9px);width:196px;background:var(--card);border:1px solid var(--line-2);border-radius:8px;box-shadow:0 18px 40px rgba(40,33,24,.16);padding:5px;z-index:60;animation:pop .22s var(--ease)}
+.menu[hidden]{display:none}
+@keyframes pop{from{opacity:0;transform:translateY(-5px)}}
+.menu button{display:flex;align-items:center;gap:8px;width:100%;padding:8px 9px;border:0;background:none;border-radius:5px;text-align:left;font:500 9.5px/1.3 var(--mono);letter-spacing:.02em;color:var(--ink)}
+.menu button:hover{background:var(--paper)}
+.menu button.danger{color:var(--danger)}
+.menu button svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.menu hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+
+/* Board head */
+.board-head{flex:none;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:24px 24px 16px}
+.kicker{display:flex;align-items:center;gap:7px;font:500 8px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--accent-2)}
+.kicker::before{content:'';width:13px;height:1px;background:currentColor}
+.board-title h1{font:600 clamp(25px,3vw,33px)/1.1 var(--font);letter-spacing:-.035em;margin-top:6px}
+.board-sub{margin-top:5px;font:400 9px/1.5 var(--mono);letter-spacing:.05em;color:var(--muted)}
+.board-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:6px;width:218px;padding:7px 10px;background:var(--card);border:1px solid var(--line);border-radius:6px;transition:border-color .2s,box-shadow .2s}
+.search:focus-within{border-color:var(--ink);box-shadow:0 0 0 3px rgba(41,37,31,.06)}
+.search svg{width:12px;height:12px;fill:none;stroke:var(--muted);stroke-width:1.8;stroke-linecap:round;flex:none}
+.search input{flex:1;min-width:0;border:0;background:none;font:400 11px/1.4 var(--font);outline:none}
+.search input::placeholder{color:var(--muted)}
+.filter-select{appearance:none;border:1px solid var(--line);border-radius:6px;background:var(--card);padding:8px 26px 8px 10px;font:500 8.5px/1.2 var(--mono);letter-spacing:.05em;text-transform:uppercase;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%237c7466'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center}
+.filter-select:focus{outline:1px solid var(--ink);outline-offset:2px}
+.clear-filters{border:0;background:none;padding:4px 0;font:500 8.5px/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--accent-2);border-bottom:1px solid transparent;white-space:nowrap}
+.clear-filters:hover{border-bottom-color:currentColor}
+.clear-filters[hidden]{display:none}
+.team{display:flex;align-items:center;margin-left:3px;padding-left:10px;border-left:1px solid var(--line)}
+.team .avatar{width:25px;height:25px;font-size:7.5px;border:2px solid var(--paper);margin-left:-7px;box-shadow:none}
+.team .avatar:first-child{margin-left:0}
+.team-more{font:500 8px/1 var(--mono);color:var(--muted);margin-left:7px}
+.avatar{display:inline-grid;place-items:center;width:23px;height:23px;border-radius:50%;color:#fff;font:500 8px/1 var(--mono);letter-spacing:.02em;flex:none}
+
+/* Board */
+.board{flex:1;min-height:0;display:flex;gap:13px;padding:0 24px 14px;overflow-x:auto;overflow-y:hidden;align-items:stretch;background-color:#f2eee4;background-image:radial-gradient(rgba(76,65,49,.13) .8px,transparent .9px);background-size:13px 13px}
+.column{--col:#8b857b;--tint:#ece8df;flex:0 0 286px;width:286px;display:flex;flex-direction:column;min-height:0;max-height:100%;background:var(--tint);border:1px solid rgba(50,44,34,.1);border-top:3px solid var(--col);border-radius:9px;padding:9px;transition:box-shadow .2s,background .2s}
+.column[data-col="todo"]{--col:#3f6d95;--tint:#e9eef4}
+.column[data-col="progress"]{--col:#b3762a;--tint:#f4ecdd}
+.column[data-col="done"]{--col:#3f6b50;--tint:#e7eee8}
+.column.drag-over{box-shadow:inset 0 0 0 2px var(--col)}
+.col-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:1px 2px 9px}
+.col-title{display:flex;align-items:center;gap:7px;min-width:0}
+.col-dot{width:7px;height:7px;border-radius:50%;background:var(--col);flex:none}
+.col-title h2{font:600 12.5px/1.2 var(--font);letter-spacing:-.01em;white-space:nowrap}
+.count{font:500 8px/1 var(--mono);color:var(--muted);background:rgba(255,255,255,.62);border:1px solid rgba(50,44,34,.08);border-radius:99px;padding:2px 6px;min-width:20px;text-align:center}
+.add-col{width:24px;height:24px;flex:none;display:grid;place-items:center;border:1px dashed var(--line-2);border-radius:5px;background:none;color:var(--muted);font:400 15px/1 var(--font);transition:all .2s}
+.add-col:hover{background:var(--card);border-style:solid;border-color:var(--col);color:var(--ink)}
+.cards{display:flex;flex-direction:column;gap:8px;flex:1;min-height:64px;overflow-y:auto;padding:1px 1px 3px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+.cards::-webkit-scrollbar{width:5px}
+.cards::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:99px}
+.cards::-webkit-scrollbar-track{background:transparent}
+.column.drag-over .cards{background:rgba(255,255,255,.42);border-radius:6px}
+
+.kcard{background:var(--card);border:1px solid #e4dccd;border-radius:7px;padding:10px 10px 9px;cursor:grab;transition:box-shadow .2s,transform .2s,border-color .2s;position:relative}
+.kcard:hover{border-color:#d2c7b5;box-shadow:0 2px 0 rgba(41,37,31,.05),0 6px 14px rgba(41,37,31,.05);transform:translateY(-1px)}
+.kcard:active{cursor:grabbing}
+.kcard.dragging{opacity:.35;transform:rotate(1.2deg)}
+.kcard-top{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
+.tag{display:inline-flex;align-items:center;font:500 7px/1 var(--mono);letter-spacing:.07em;text-transform:uppercase;padding:3px 6px;border:1px solid transparent;border-radius:3px;white-space:nowrap}
+.grip{display:grid;grid-template-columns:repeat(2,3px);gap:2px;color:var(--line-2);flex:none;padding:2px 1px;transition:color .2s}
+.grip i{width:3px;height:3px;border-radius:50%;background:currentColor}
+.kcard:hover .grip{color:var(--muted)}
+.kcard h3{font:500 12.8px/1.35 var(--font);letter-spacing:-.005em}
+.kcard .notes{margin-top:4px;font-size:11px;line-height:1.5;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.kmeta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px}
+.kmeta .avatar{width:22px;height:22px;font-size:7.5px;box-shadow:0 0 0 1px rgba(50,44,34,.08)}
+.due{display:inline-flex;align-items:center;gap:4px;font:500 7.5px/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.due.overdue{color:var(--danger)}
+.due.overdue::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor}
+.kcard.is-done{background:#fdfcf7}
+.kcard.is-done h3{color:#59544b}
+.kcard.is-done .due{color:var(--ok)}
+.empty{font:400 9.5px/1.6 var(--mono);color:var(--muted);text-align:center;padding:17px 10px;border:1px dashed var(--line-2);border-radius:6px;background:rgba(255,255,255,.32);letter-spacing:.02em}
+
+.board-foot{flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px 13px;font:400 8px/1.5 var(--mono);letter-spacing:.04em;color:var(--muted)}
+.board-foot kbd{display:inline-block;min-width:16px;text-align:center;font:500 8px/1 var(--mono);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:3px;padding:2px 4px;background:var(--card);color:var(--ink);margin:0 2px}
+
+/* Dialogs */
+.modal{width:min(520px,calc(100% - 24px));max-height:min(90dvh,720px);overflow:auto;border:1px solid var(--line-2);border-radius:12px;padding:0;background:var(--card);color:var(--ink);box-shadow:0 30px 80px rgba(40,33,24,.3)}
+.modal::backdrop{background:rgba(40,33,24,.42);backdrop-filter:blur(3px)}
+.modal[open]{animation:modalIn .3s var(--ease)}
+@keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(.99)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 20px;border-bottom:1px solid var(--line)}
+.modal-head h2{font:600 19px/1.2 var(--font);letter-spacing:-.025em}
+.modal-head .icon-btn:hover{background:var(--paper)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:18px 20px 20px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field--full{grid-column:1/-1}
+.field label{font:500 7.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:5px;background:var(--paper);padding:8px 10px;font:400 12px/1.45 var(--font);min-width:0;transition:border-color .2s,box-shadow .2s}
+.field textarea{resize:vertical;min-height:68px}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%237c7466'/%3E%3C/svg%3E"),linear-gradient(var(--paper),var(--paper));background-repeat:no-repeat;background-position:right 9px center;padding-right:26px;cursor:pointer}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(41,37,31,.06)}
+.field input[aria-invalid="true"]{border-color:var(--danger)}
+.form-error{grid-column:1/-1;font:500 8.5px/1.5 var(--mono);letter-spacing:.02em;color:var(--danger);min-height:1.3em;margin:0}
+.dialog-foot{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px;margin-top:2px}
+.dialog-foot .right{display:flex;gap:8px;flex-wrap:wrap}
+.modal--sm{width:min(400px,calc(100% - 24px));padding:22px}
+.modal--sm h2{font:600 21px/1.2 var(--font);letter-spacing:-.025em}
+.modal--sm p{margin-top:9px;color:var(--muted);font-size:12px;line-height:1.6}
+.modal--sm .dialog-foot{margin-top:20px;display:flex;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--line)}
+
+.toast{position:fixed;left:50%;bottom:22px;z-index:100;display:flex;align-items:center;gap:12px;transform:translate(-50%,14px);background:var(--ink);color:var(--paper);padding:9px 12px 9px 15px;border-radius:6px;font:500 8.5px/1.3 var(--mono);letter-spacing:.05em;box-shadow:0 12px 30px rgba(40,33,24,.25);opacity:0;pointer-events:none;transition:all .3s var(--ease);max-width:calc(100vw - 24px)}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{border:1px solid rgba(255,255,255,.3);background:none;color:var(--paper);border-radius:4px;padding:4px 8px;font:500 8px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.toast button:hover{background:rgba(255,255,255,.12)}
+.toast button[hidden]{display:none}
+
+@media (max-width:1180px){
+.team{display:none}
+.search{width:190px}
+}
+@media (max-width:900px){
+body{height:auto;min-height:100dvh;overflow:visible}
+.board{flex:none;overflow-x:auto;overflow-y:visible;align-items:flex-start;padding-bottom:20px;scroll-snap-type:x proximity}
+.column{width:82vw;max-width:340px;max-height:none;scroll-snap-align:start;flex:none}
+.cards{overflow:visible}
+.board-foot{display:none}
+}
+@media (max-width:620px){
+.appbar{height:56px;padding:0 14px;gap:8px}
+.brand{font-size:17px;gap:7px}
+.brand-mark{width:24px;height:24px}
+.saved-note{display:none}
+.board-head{padding:18px 16px 12px;gap:16px}
+.board-title h1{font-size:27px}
+.board-tools{width:100%}
+.search{flex:1;width:auto;min-width:0}
+.filter-select{max-width:132px}
+.team{display:none}
+.board{padding:0 16px 18px}
+.column{width:86vw}
+.form{grid-template-columns:1fr;padding:16px}
+.field--full{grid-column:auto}
+.dialog-foot{justify-content:flex-end}
+.dialog-foot .btn--danger{margin-right:auto}
+.modal-head{padding:15px 16px}
+.board-foot{padding-left:16px;padding-right:16px}
+}
+@media (prefers-reduced-motion:reduce){
+*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#board">Skip to board</a>
+
+<header class="appbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 18 18"><path d="M3.5 9.5l3.2 3.2L14.5 5"/></svg>
+    </span>
+    <span>taskly.</span>
+  </div>
+  <div class="app-actions">
+    <span class="saved-note" id="savedNote" aria-live="polite"><i></i>Saved locally</span>
+    <button class="btn btn--primary" id="newTaskBtn" type="button">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1.5v9M1.5 6h9"/></svg>
+      New task
+    </button>
+    <div class="menu-wrap">
+      <button class="icon-btn" id="moreBtn" type="button" aria-label="Board options" aria-expanded="false" aria-controls="moreMenu">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="3" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="13" cy="8" r="1.2" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <div class="menu" id="moreMenu" hidden>
+        <button id="exportBtn" type="button">
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v7M3.5 5.5L6 8l2.5-2.5M2 9.5v.5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-.5"/></svg>
+          Export board
+        </button>
+        <hr>
+        <button class="danger" id="resetBtn" type="button">
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M10.5 2.5v3h-3"/><path d="M10.2 5.2a4.4 4.4 0 1 0-.6 3.7"/></svg>
+          Reset demo
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="board-head">
+  <div class="board-title">
+    <p class="kicker">Sprint 14 · Product</p>
+    <h1>A clear view of the week.</h1>
+    <p class="board-sub" id="boardSub">Loading the board…</p>
+  </div>
+  <div class="board-tools">
+    <label class="search">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="5" cy="5" r="3.4"/><path d="M7.5 7.5L10.5 10.5"/></svg>
+      <span class="sr">Search tasks</span>
+      <input id="searchInput" type="search" placeholder="Search tasks" autocomplete="off">
+    </label>
+    <select class="filter-select" id="filterSelect" aria-label="Filter by label">
+      <option value="all">All labels</option>
+      <option value="Design">Design</option>
+      <option value="Frontend">Frontend</option>
+      <option value="Copy">Copy</option>
+      <option value="Research">Research</option>
+      <option value="Ops">Ops</option>
+    </select>
+    <button class="clear-filters" id="clearFilters" type="button" hidden>Clear filters</button>
+    <div class="team" aria-label="Project team">
+      <span class="avatar" style="background:#b3543f" title="Sofia Reyes">SR</span>
+      <span class="avatar" style="background:#3f6d95" title="Leo Chen">LC</span>
+      <span class="avatar" style="background:#3f6b50" title="Maya Okafor">MO</span>
+      <span class="avatar" style="background:#65507d" title="Elias Novak">EN</span>
+      <span class="team-more">+4</span>
+    </div>
+  </div>
+</div>
+
+<section class="board" id="board" aria-label="Task board">
+  <section class="column" data-col="backlog" aria-labelledby="col-backlog">
+    <div class="col-head">
+      <div class="col-title">
+        <span class="col-dot" aria-hidden="true"></span>
+        <h2 id="col-backlog">Backlog</h2>
+        <span class="count" data-count="backlog">0</span>
+      </div>
+      <button class="add-col" type="button" data-add="backlog" aria-label="Add task to Backlog">+</button>
+    </div>
+    <div class="cards" data-cards="backlog"></div>
+  </section>
+
+  <section class="column" data-col="todo" aria-labelledby="col-todo">
+    <div class="col-head">
+      <div class="col-title">
+        <span class="col-dot" aria-hidden="true"></span>
+        <h2 id="col-todo">Up next</h2>
+        <span class="count" data-count="todo">0</span>
+      </div>
+      <button class="add-col" type="button" data-add="todo" aria-label="Add task to Up next">+</button>
+    </div>
+    <div class="cards" data-cards="todo"></div>
+  </section>
+
+  <section class="column" data-col="progress" aria-labelledby="col-progress">
+    <div class="col-head">
+      <div class="col-title">
+        <span class="col-dot" aria-hidden="true"></span>
+        <h2 id="col-progress">In progress</h2>
+        <span class="count" data-count="progress">0</span>
+      </div>
+      <button class="add-col" type="button" data-add="progress" aria-label="Add task to In progress">+</button>
+    </div>
+    <div class="cards" data-cards="progress"></div>
+  </section>
+
+  <section class="column" data-col="done" aria-labelledby="col-done">
+    <div class="col-head">
+      <div class="col-title">
+        <span class="col-dot" aria-hidden="true"></span>
+        <h2 id="col-done">Done</h2>
+        <span class="count" data-count="done">0</span>
+      </div>
+      <button class="add-col" type="button" data-add="done" aria-label="Add task to Done">+</button>
+    </div>
+    <div class="cards" data-cards="done"></div>
+  </section>
+</section>
+
+<footer class="board-foot">
+  <p>Drag cards between columns · changes save automatically</p>
+  <p><kbd>N</kbd> new task <kbd>/</kbd> search</p>
+</footer>
+
+<div class="sr" id="boardStatus" aria-live="polite"></div>
+
+<dialog class="modal" id="taskDialog" aria-labelledby="taskDialogTitle">
+  <div class="modal-head">
+    <h2 id="taskDialogTitle">New task</h2>
+    <button class="icon-btn" type="button" data-close aria-label="Close task dialog">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+    </button>
+  </div>
+  <form class="form" id="taskForm" novalidate>
+    <input id="taskId" type="hidden">
+    <div class="field field--full">
+      <label for="taskTitle">Title</label>
+      <input id="taskTitle" name="title" type="text" maxlength="80" autocomplete="off" required>
+    </div>
+    <div class="field field--full">
+      <label for="taskNotes">Notes (optional)</label>
+      <textarea id="taskNotes" name="notes" maxlength="240"></textarea>
+    </div>
+    <div class="field">
+      <label for="taskLabel">Label</label>
+      <select id="taskLabel" name="label">
+        <option value="Design">Design</option>
+        <option value="Frontend">Frontend</option>
+        <option value="Copy">Copy</option>
+        <option value="Research">Research</option>
+        <option value="Ops">Ops</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="taskColumn">Column</label>
+      <select id="taskColumn" name="column">
+        <option value="backlog">Backlog</option>
+        <option value="todo">Up next</option>
+        <option value="progress">In progress</option>
+        <option value="done">Done</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="taskAssignee">Assignee</label>
+      <select id="taskAssignee" name="assignee">
+        <option value="Sofia Reyes">Sofia Reyes</option>
+        <option value="Leo Chen">Leo Chen</option>
+        <option value="Elias Novak">Elias Novak</option>
+        <option value="Maya Okafor">Maya Okafor</option>
+        <option value="Priya Shah">Priya Shah</option>
+        <option value="Kai Tanaka">Kai Tanaka</option>
+        <option value="Amara Costa">Amara Costa</option>
+        <option value="Jonah Kim">Jonah Kim</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="taskDue">Due date</label>
+      <input id="taskDue" name="due" type="date">
+    </div>
+    <p class="form-error" id="taskError" role="alert"></p>
+    <div class="dialog-foot">
+      <button class="btn btn--danger" id="deleteTaskBtn" type="button" hidden>Delete</button>
+      <div class="right">
+        <button class="btn" id="cancelTaskBtn" type="button">Cancel</button>
+        <button class="btn btn--primary" type="submit">Save task</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="modal modal--sm" id="confirmDialog" aria-labelledby="confirmTitle">
+  <h2 id="confirmTitle">Reset the board?</h2>
+  <p>This clears your local changes and restores the sample sprint. You can undo it right after.</p>
+  <div class="dialog-foot">
+    <button class="btn" id="confirmCancel" type="button">Keep board</button>
+    <button class="btn btn--danger" id="confirmReset" type="button">Reset board</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span id="toastText"></span>
+  <button id="toastUndo" type="button" hidden>Undo</button>
+</div>
+<script>
+(() => {
+  const STORAGE_KEY = 'taskly_board_v1';
+  const COLUMN_NAMES = { backlog: 'Backlog', todo: 'Up next', progress: 'In progress', done: 'Done' };
+  const LABELS = {
+    Design: { bg: '#f5e7e1', fg: '#8f3e2c', border: '#e8cfc7' },
+    Frontend: { bg: '#e6edf5', fg: '#2f5f8a', border: '#ccdbea' },
+    Copy: { bg: '#f4eddc', fg: '#85601f', border: '#e8dcc0' },
+    Research: { bg: '#e7eee8', fg: '#3f6b50', border: '#d0dfd4' },
+    Ops: { bg: '#ece8f2', fg: '#65507d', border: '#dbd2e4' }
+  };
+  const MEMBERS = {
+    'Sofia Reyes': { initials: 'SR', color: '#b3543f' },
+    'Leo Chen': { initials: 'LC', color: '#3f6d95' },
+    'Elias Novak': { initials: 'EN', color: '#65507d' },
+    'Maya Okafor': { initials: 'MO', color: '#3f6b50' },
+    'Priya Shah': { initials: 'PS', color: '#b3762a' },
+    'Kai Tanaka': { initials: 'KT', color: '#7a5c44' },
+    'Amara Costa': { initials: 'AC', color: '#944f6b' },
+    'Jonah Kim': { initials: 'JK', color: '#4f6352' }
+  };
+
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+  const savedNote = $('#savedNote');
+  const searchInput = $('#searchInput');
+  const filterSelect = $('#filterSelect');
+  const clearFilters = $('#clearFilters');
+  const boardSub = $('#boardSub');
+  const boardStatus = $('#boardStatus');
+  const moreBtn = $('#moreBtn');
+  const moreMenu = $('#moreMenu');
+  const taskDialog = $('#taskDialog');
+  const taskForm = $('#taskForm');
+  const taskDialogTitle = $('#taskDialogTitle');
+  const taskIdInput = $('#taskId');
+  const taskTitle = $('#taskTitle');
+  const taskNotes = $('#taskNotes');
+  const taskLabel = $('#taskLabel');
+  const taskColumn = $('#taskColumn');
+  const taskAssignee = $('#taskAssignee');
+  const taskDue = $('#taskDue');
+  const taskError = $('#taskError');
+  const deleteTaskBtn = $('#deleteTaskBtn');
+  const confirmDialog = $('#confirmDialog');
+  const toast = $('#toast');
+  const toastText = $('#toastText');
+  const toastUndo = $('#toastUndo');
+
+  const storage = (() => {
+    try {
+      const probe = '__taskly_probe__';
+      window.localStorage.setItem(probe, '1');
+      window.localStorage.removeItem(probe);
+      return window.localStorage;
+    } catch {
+      return null;
+    }
+  })();
+
+  if (!storage) {
+    savedNote.innerHTML = '<i></i>Preview only';
+  }
+
+  const pad = value => String(value).padStart(2, '0');
+  const toISODate = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+  function dateFromOffset(offset) {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + offset);
+    return toISODate(date);
+  }
+
+  function parseDate(value) {
+    if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    const parts = value.split('-').map(Number);
+    const date = new Date(parts[0], parts[1] - 1, parts[2]);
+    if (date.getFullYear() !== parts[0] || date.getMonth() !== parts[1] - 1 || date.getDate() !== parts[2]) return null;
+    return date;
+  }
+
+  function daysUntil(value) {
+    const due = parseDate(value);
+    if (!due) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Math.round((due - today) / 86400000);
+  }
+
+  function formatDue(value, isDone) {
+    const due = parseDate(value);
+    if (!due) return '';
+    const delta = daysUntil(value);
+    if (!isDone) {
+      if (delta === 0) return 'Today';
+      if (delta === 1) return 'Tomorrow';
+      if (delta === -1) return 'Yesterday';
+    }
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(due);
+  }
+
+  function seedTasks() {
+    return [
+      { id: 't1', title: 'Define the spring capsule story', notes: 'Three-product narrative, editorial references and a launch calendar.', column: 'todo', label: 'Design', assignee: 'Sofia Reyes', due: dateFromOffset(0) },
+      { id: 't2', title: 'Build the responsive collection grid', notes: 'Fluid two-to-four column layout with quiet staggered reveals.', column: 'progress', label: 'Frontend', assignee: 'Leo Chen', due: dateFromOffset(2) },
+      { id: 't3', title: 'Tighten product page microcopy', notes: 'Material notes, care guidance and one-sentence fit callouts.', column: 'backlog', label: 'Copy', assignee: 'Maya Okafor', due: dateFromOffset(4) },
+      { id: 't4', title: 'Test the cart on small screens', notes: 'Safari iOS at 360px. Check drawer focus and scroll lock.', column: 'done', label: 'Frontend', assignee: 'Priya Shah', due: dateFromOffset(-1) },
+      { id: 't5', title: 'Write the lookbook introduction', notes: 'One hundred and twenty words. Quiet confidence, no perfume adjectives.', column: 'progress', label: 'Copy', assignee: 'Elias Novak', due: dateFromOffset(1) },
+      { id: 't6', title: 'Audit color contrast', notes: 'Focus states, muted text and form errors against cream.', column: 'todo', label: 'Design', assignee: 'Maya Okafor', due: dateFromOffset(3) },
+      { id: 't7', title: 'Prepare the wholesale one-pager', notes: 'Stockists, lead times and minimum order quantities.', column: 'backlog', label: 'Ops', assignee: 'Jonah Kim', due: dateFromOffset(6) },
+      { id: 't8', title: 'Research recycled packaging', notes: 'Compare three suppliers on cost, certification and finish.', column: 'backlog', label: 'Research', assignee: 'Amara Costa', due: dateFromOffset(5) },
+      { id: 't9', title: 'Fix the saved-items empty state', notes: 'Add a useful route back to the collection instead of a dead end.', column: 'done', label: 'Frontend', assignee: 'Kai Tanaka', due: dateFromOffset(-2) },
+      { id: 't10', title: 'Record the checkout walkthrough', notes: 'A sixty-second clip for the launch handoff.', column: 'todo', label: 'Ops', assignee: 'Maya Okafor', due: dateFromOffset(2) },
+      { id: 't11', title: 'Sketch the mobile navigation', notes: 'A lighter filter pattern for narrow screens.', column: 'progress', label: 'Design', assignee: 'Sofia Reyes', due: dateFromOffset(2) }
+    ];
+  }
+
+  function uid() {
+    return `t${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
+  }
+
+  function loadTasks() {
+    try {
+      const raw = storage && storage.getItem(STORAGE_KEY);
+      if (!raw) return seedTasks();
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return seedTasks();
+      return parsed
+        .filter(task => task && typeof task.id === 'string' && typeof task.title === 'string')
+        .map(task => ({
+          id: task.id,
+          title: task.title.slice(0, 80),
+          notes: typeof task.notes === 'string' ? task.notes.slice(0, 240) : '',
+          column: COLUMN_NAMES[task.column] ? task.column : 'backlog',
+          label: LABELS[task.label] ? task.label : 'Design',
+          assignee: MEMBERS[task.assignee] ? task.assignee : 'Sofia Reyes',
+          due: parseDate(task.due) ? task.due : ''
+        }));
+    } catch {
+      return seedTasks();
+    }
+  }
+
+  let tasks = loadTasks();
+  let draggedId = null;
+  let toastTimer = 0;
+  let savedFlashTimer = 0;
+  let undoAction = null;
+
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]);
+  }
+
+  function pulseSaved() {
+    savedNote.classList.remove('flash');
+    void savedNote.offsetWidth;
+    savedNote.classList.add('flash');
+    window.clearTimeout(savedFlashTimer);
+    savedFlashTimer = window.setTimeout(() => savedNote.classList.remove('flash'), 800);
+  }
+
+  function saveTasks() {
+    if (!storage) return;
+    try {
+      storage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      pulseSaved();
+    } catch {
+      announce('This browser could not save the latest change.');
+    }
+  }
+
+  function announce(message) {
+    boardStatus.textContent = '';
+    window.setTimeout(() => { boardStatus.textContent = message; }, 40);
+  }
+
+  function hideToast() {
+    window.clearTimeout(toastTimer);
+    toast.classList.remove('show');
+    toastUndo.hidden = true;
+    undoAction = null;
+  }
+
+  function showToast(message, action = null) {
+    window.clearTimeout(toastTimer);
+    toastText.textContent = message;
+    undoAction = typeof action === 'function' ? action : null;
+    toastUndo.hidden = !undoAction;
+    toast.classList.add('show');
+    toastTimer = window.setTimeout(hideToast, 6500);
+  }
+
+  function shorten(value, max = 42) {
+    return value.length > max ? `${value.slice(0, max - 1).trimEnd()}…` : value;
+  }
+
+  function cardElement(task) {
+    const member = MEMBERS[task.assignee] || MEMBERS['Sofia Reyes'];
+    const palette = LABELS[task.label] || LABELS.Design;
+    const isDone = task.column === 'done';
+    const due = formatDue(task.due, isDone);
+    const isOverdue = daysUntil(task.due) < 0 && !isDone;
+    const card = document.createElement('article');
+    card.className = `kcard${isDone ? ' is-done' : ''}`;
+    card.draggable = true;
+    card.tabIndex = 0;
+    card.dataset.id = task.id;
+    card.setAttribute('aria-label', `${task.title}. ${COLUMN_NAMES[task.column]}. ${task.label}. Assigned to ${task.assignee}. Press Enter to edit.`);
+    card.innerHTML = `
+      <div class="kcard-top">
+        <span class="tag" style="background:${palette.bg};color:${palette.fg};border-color:${palette.border}">${escapeHTML(task.label)}</span>
+        <span class="grip" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      </div>
+      <h3>${escapeHTML(task.title)}</h3>
+      ${task.notes ? `<p class="notes">${escapeHTML(task.notes)}</p>` : ''}
+      <div class="kmeta">
+        <span class="avatar" style="background:${member.color}" title="${escapeHTML(task.assignee)}">${member.initials}</span>
+        ${due ? `<span class="due${isOverdue ? ' overdue' : ''}">${escapeHTML(due)}</span>` : '<span class="due" aria-hidden="true"></span>'}
+      </div>`;
+    card.addEventListener('click', () => openTaskDialog(task.id));
+    card.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openTaskDialog(task.id);
+      }
+    });
+    card.addEventListener('dragstart', event => {
+      draggedId = task.id;
+      card.classList.add('dragging');
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', task.id);
+    });
+    card.addEventListener('dragend', () => {
+      draggedId = null;
+      card.classList.remove('dragging');
+      $$('.column.drag-over').forEach(column => column.classList.remove('drag-over'));
+    });
+    return card;
+  }
+
+  function render() {
+    const query = searchInput.value.trim().toLowerCase();
+    const label = filterSelect.value;
+    const hasFilters = Boolean(query) || label !== 'all';
+    let visibleTotal = 0;
+    clearFilters.hidden = !hasFilters;
+
+    $$('.column').forEach(column => {
+      const columnId = column.dataset.col;
+      const columnTasks = tasks.filter(task => task.column === columnId);
+      const visibleTasks = columnTasks.filter(task => {
+        const matchesLabel = label === 'all' || task.label === label;
+        const haystack = `${task.title} ${task.notes} ${task.label} ${task.assignee}`.toLowerCase();
+        return matchesLabel && (!query || haystack.includes(query));
+      });
+      visibleTotal += visibleTasks.length;
+      const count = $(`[data-count="${columnId}"]`);
+      if (count) count.textContent = String(visibleTasks.length);
+      const cards = $(`[data-cards="${columnId}"]`);
+      cards.replaceChildren();
+      if (!visibleTasks.length) {
+        const empty = document.createElement('p');
+        empty.className = 'empty';
+        empty.textContent = hasFilters ? 'Nothing matches here' : 'Drop a task here';
+        cards.append(empty);
+      } else {
+        visibleTasks.forEach(task => cards.append(cardElement(task)));
+      }
+    });
+
+    const complete = tasks.filter(task => task.column === 'done').length;
+    boardSub.textContent = hasFilters
+      ? `Showing ${visibleTotal} of ${tasks.length} tasks · filters active`
+      : `${tasks.length} tasks · ${complete} complete · saved on this device`;
+  }
+
+  function closeMenu() {
+    moreMenu.hidden = true;
+    moreBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  function openTaskDialog(id = null, column = null) {
+    taskForm.reset();
+    taskError.textContent = '';
+    taskTitle.removeAttribute('aria-invalid');
+    const task = id ? tasks.find(item => item.id === id) : null;
+    if (id && !task) return;
+    taskIdInput.value = task ? task.id : '';
+    taskDialogTitle.textContent = task ? 'Edit task' : 'New task';
+    deleteTaskBtn.hidden = !task;
+    if (task) {
+      taskTitle.value = task.title;
+      taskNotes.value = task.notes;
+      taskLabel.value = task.label;
+      taskColumn.value = task.column;
+      taskAssignee.value = task.assignee;
+      taskDue.value = task.due;
+    } else {
+      taskColumn.value = COLUMN_NAMES[column] ? column : 'backlog';
+      taskLabel.value = 'Design';
+      taskAssignee.value = 'Sofia Reyes';
+      taskDue.value = '';
+    }
+    document.body.classList.add('locked');
+    taskDialog.showModal();
+    window.setTimeout(() => taskTitle.focus(), 30);
+  }
+
+  function moveTask(id, column, beforeId) {
+    const index = tasks.findIndex(task => task.id === id);
+    if (index < 0 || !COLUMN_NAMES[column]) return;
+    const task = tasks[index];
+    const previousColumn = task.column;
+    tasks.splice(index, 1);
+    task.column = column;
+    let insertAt = tasks.length;
+    if (beforeId) {
+      const targetIndex = tasks.findIndex(item => item.id === beforeId);
+      if (targetIndex >= 0) insertAt = targetIndex;
+    }
+    tasks.splice(insertAt, 0, task);
+    saveTasks();
+    render();
+    announce(previousColumn === column
+      ? `Reordered ${task.title}.`
+      : `Moved ${task.title} to ${COLUMN_NAMES[column]}.`);
+  }
+
+  function removeTask(id) {
+    const index = tasks.findIndex(task => task.id === id);
+    if (index < 0) return;
+    const removed = tasks[index];
+    tasks.splice(index, 1);
+    saveTasks();
+    render();
+    if (taskDialog.open) taskDialog.close();
+    announce(`Deleted ${removed.title}.`);
+    showToast(`${shorten(removed.title)} deleted`, () => {
+      tasks.splice(Math.min(index, tasks.length), 0, removed);
+      saveTasks();
+      render();
+      announce(`Restored ${removed.title}.`);
+    });
+  }
+
+  function exportBoard() {
+    const payload = {
+      board: 'Taskly',
+      exportedAt: new Date().toISOString(),
+      tasks
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'taskly-board.json';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    closeMenu();
+    showToast('Board exported as JSON');
+  }
+
+  $$('.column').forEach(column => {
+    column.addEventListener('dragover', event => {
+      if (!draggedId) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      column.classList.add('drag-over');
+    });
+    column.addEventListener('dragleave', event => {
+      if (!column.contains(event.relatedTarget)) column.classList.remove('drag-over');
+    });
+    column.addEventListener('drop', event => {
+      event.preventDefault();
+      column.classList.remove('drag-over');
+      const id = draggedId || event.dataTransfer.getData('text/plain');
+      if (!id) return;
+      const target = event.target.closest('.kcard');
+      if (target && target.dataset.id === id) return;
+      moveTask(id, column.dataset.col, target ? target.dataset.id : null);
+    });
+  });
+
+  $('#newTaskBtn').addEventListener('click', () => openTaskDialog());
+  $$('[data-add]').forEach(button => {
+    button.addEventListener('click', () => openTaskDialog(null, button.dataset.add));
+  });
+
+  searchInput.addEventListener('input', render);
+  filterSelect.addEventListener('change', render);
+  clearFilters.addEventListener('click', () => {
+    searchInput.value = '';
+    filterSelect.value = 'all';
+    render();
+    searchInput.focus();
+  });
+
+  taskForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const title = taskTitle.value.trim();
+    if (!title) {
+      taskError.textContent = 'Give this task a short title.';
+      taskTitle.setAttribute('aria-invalid', 'true');
+      taskTitle.focus();
+      return;
+    }
+    taskError.textContent = '';
+    taskTitle.removeAttribute('aria-invalid');
+    const existing = taskIdInput.value ? tasks.find(task => task.id === taskIdInput.value) : null;
+    const values = {
+      title,
+      notes: taskNotes.value.trim(),
+      column: COLUMN_NAMES[taskColumn.value] ? taskColumn.value : 'backlog',
+      label: LABELS[taskLabel.value] ? taskLabel.value : 'Design',
+      assignee: MEMBERS[taskAssignee.value] ? taskAssignee.value : 'Sofia Reyes',
+      due: parseDate(taskDue.value) ? taskDue.value : ''
+    };
+    if (existing) {
+      Object.assign(existing, values);
+      announce(`Updated ${title}.`);
+    } else {
+      tasks.unshift({ id: uid(), ...values });
+      announce(`Created ${title}.`);
+    }
+    saveTasks();
+    taskDialog.close();
+    render();
+  });
+
+  taskDialog.querySelector('[data-close]').addEventListener('click', () => taskDialog.close());
+  $('#cancelTaskBtn').addEventListener('click', () => taskDialog.close());
+  deleteTaskBtn.addEventListener('click', () => {
+    if (taskIdInput.value) removeTask(taskIdInput.value);
+  });
+  taskDialog.addEventListener('close', () => {
+    if (!confirmDialog.open) document.body.classList.remove('locked');
+  });
+
+  $('#confirmCancel').addEventListener('click', () => confirmDialog.close());
+  $('#confirmReset').addEventListener('click', () => {
+    const previous = tasks.map(task => ({ ...task }));
+    tasks = seedTasks();
+    saveTasks();
+    render();
+    confirmDialog.close();
+    announce('Board reset to the sample sprint.');
+    showToast('Board reset to the sample sprint', () => {
+      tasks = previous;
+      saveTasks();
+      render();
+      announce('Previous board restored.');
+    });
+  });
+  confirmDialog.addEventListener('close', () => {
+    if (!taskDialog.open) document.body.classList.remove('locked');
+  });
+
+  [taskDialog, confirmDialog].forEach(dialog => {
+    dialog.addEventListener('click', event => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+
+  moreBtn.addEventListener('click', () => {
+    const willOpen = moreMenu.hidden;
+    moreMenu.hidden = !willOpen;
+    moreBtn.setAttribute('aria-expanded', String(willOpen));
+  });
+  document.addEventListener('click', event => {
+    if (!moreMenu.hidden && !event.target.closest('.menu-wrap')) closeMenu();
+  });
+  $('#exportBtn').addEventListener('click', exportBoard);
+  $('#resetBtn').addEventListener('click', () => {
+    closeMenu();
+    document.body.classList.add('locked');
+    confirmDialog.showModal();
+  });
+
+  toastUndo.addEventListener('click', () => {
+    const action = undoAction;
+    hideToast();
+    if (action) action();
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !moreMenu.hidden) {
+      closeMenu();
+      moreBtn.focus();
+      return;
+    }
+    if (taskDialog.open || confirmDialog.open) return;
+    const target = event.target;
+    const isTyping = target.matches('input, textarea, select') || target.isContentEditable;
+    if (isTyping || event.metaKey || event.ctrlKey || event.altKey) return;
+    if (event.key === '/') {
+      event.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+    } else if (event.key.toLowerCase() === 'n') {
+      event.preventDefault();
+      openTaskDialog();
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-*
+
+# Temporary files
+*.tmp
+*.log
+~*
+
+# Test files (optional - remove if you want to include tests)
+node_modules/
+package-lock.json
+
+# Local environment
+.env
+.env.local

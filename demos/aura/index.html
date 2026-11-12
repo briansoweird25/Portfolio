@@ -1,0 +1,1193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aura — Find a scent that feels like you</title>
+<meta name="description" content="Aura is an on-device fragrance finder. Describe a mood, note or moment and explore sixteen small-batch scent compositions. Plain HTML, CSS and JavaScript.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='16' fill='%23241e27'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23f5efe3' stroke-width='1.2'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23d8c477'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Mono:wght@400;500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#241e27;--ink-2:#302834;--cream:#f5efe3;--paper:#efe8da;--card:#f9f4e9;--line:#d8cfbf;--line-2:#c5b9a7;--muted:#7d756b;--rose:#c67b6c;--rose-dark:#a85f52;--citron:#d8c477;--lilac:#a493aa;--sage:#8d9c7f;--danger:#a54e43;--font:'Karla','Helvetica Neue',Arial,sans-serif;--display:'Cormorant Garamond',Georgia,serif;--mono:'DM Mono',ui-monospace,Menlo,Consolas,monospace;--ease:cubic-bezier(.16,1,.3,1)}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font:400 13px/1.55 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.locked{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3,p,ul,ol{margin:0;padding:0}
+ul,ol{list-style:none}
+svg{display:block}
+:focus-visible{outline:2px solid var(--citron);outline-offset:2px}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:-999px;top:10px;background:var(--cream);color:var(--ink);padding:9px 14px;border-radius:2px;z-index:200;font:500 10px var(--mono)}
+.skip:focus{left:10px}
+
+/* Header */
+.site-header{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--ink) 93%,transparent);backdrop-filter:blur(14px);color:var(--cream);border-bottom:1px solid rgba(245,239,227,.1)}
+.header-inner{max-width:1420px;margin:0 auto;height:64px;padding:0 28px;display:flex;align-items:center;gap:28px}
+.brand{display:inline-flex;align-items:center;gap:10px;flex:none}
+.brand-mark{position:relative;display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(245,239,227,.42);border-radius:50%}
+.brand-mark::before,.brand-mark::after{content:'';position:absolute;border-radius:50%;border:1px solid rgba(245,239,227,.2)}
+.brand-mark::before{inset:5px}
+.brand-mark::after{width:5px;height:5px;background:var(--citron);border:0}
+.brand-name{font:500 29px/.8 var(--display);letter-spacing:.01em}
+.brand-sub{font:400 6.5px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:rgba(245,239,227,.48);border-left:1px solid rgba(245,239,227,.2);padding-left:11px;margin-left:2px}
+.header-meta{margin-left:auto;font:400 7px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase;color:rgba(245,239,227,.48);white-space:nowrap}
+.header-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.shelf-btn{display:inline-flex;align-items:center;gap:8px;height:35px;padding:0 12px;border:1px solid rgba(245,239,227,.27);border-radius:2px;background:none;color:var(--cream);font:500 8px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;transition:background .2s,border-color .2s}
+.shelf-btn:hover{background:rgba(245,239,227,.08);border-color:rgba(245,239,227,.55)}
+.shelf-btn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.shelf-btn .count{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 4px;border-radius:99px;background:var(--citron);color:var(--ink);font:500 7px/1 var(--mono)}
+
+/* Hero */
+.hero{position:relative;overflow:hidden;background:var(--ink);color:var(--cream)}
+.hero::before{content:'';position:absolute;right:-10%;top:-55%;width:820px;height:820px;border-radius:50%;background:radial-gradient(circle,rgba(166,147,170,.22),rgba(166,147,170,0) 67%);pointer-events:none}
+.hero::after{content:'';position:absolute;left:-16%;bottom:-70%;width:760px;height:760px;border-radius:50%;background:radial-gradient(circle,rgba(216,196,119,.1),rgba(216,196,119,0) 68%);pointer-events:none}
+.hero-inner{position:relative;z-index:2;max-width:1420px;margin:0 auto;padding:55px 28px 48px}
+.hero-top{display:flex;align-items:flex-end;justify-content:space-between;gap:48px}
+.kicker{display:flex;align-items:center;gap:8px;font:500 7.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--citron)}
+.kicker::before{content:'';width:16px;height:1px;background:currentColor}
+.hero h1{margin-top:14px;max-width:910px;font:400 clamp(58px,7vw,96px)/.87 var(--display);letter-spacing:-.045em}
+.hero h1 em{font-weight:400;font-style:italic;color:var(--citron)}
+.hero-note{width:255px;flex:none;padding-bottom:9px;color:rgba(245,239,227,.62);font-size:11px;line-height:1.7}
+.hero-note strong{display:block;margin-bottom:7px;font:500 7px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase;color:rgba(245,239,227,.4)}
+.hero-note span{display:block;margin-top:9px;font:400 7px/1.5 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--citron)}
+.hero-rings{position:absolute;right:8%;top:7%;width:355px;height:355px;pointer-events:none;opacity:.7}
+.hero-rings i{position:absolute;inset:0;border:1px solid rgba(245,239,227,.11);border-radius:50%}
+.hero-rings i:nth-child(2){inset:15%}
+.hero-rings i:nth-child(3){inset:30%;border-color:rgba(245,239,227,.17)}
+.hero-rings i:nth-child(4){inset:44%;background:radial-gradient(circle,rgba(216,196,119,.2),transparent 69%);border-color:rgba(216,196,119,.23)}
+.finder-wrap{position:relative;margin-top:40px;max-width:1020px}
+.finder{display:flex;align-items:center;gap:8px;padding:7px;background:var(--cream);border:1px solid rgba(255,255,255,.4);border-radius:3px;box-shadow:0 20px 50px rgba(0,0,0,.18)}
+.finder>svg{width:18px;height:18px;margin-left:11px;flex:none;fill:none;stroke:var(--muted);stroke-width:1.4;stroke-linecap:round}
+.finder input{flex:1;min-width:0;border:0;background:none;padding:7px 2px;font:400 15px/1.4 var(--font);color:var(--ink);outline:none}
+.finder input::placeholder{color:#948b7e;font-family:var(--display);font-style:italic;font-size:17px}
+.finder button{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 17px;border:0;border-radius:2px;background:var(--ink);color:var(--cream);font:500 8px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;transition:background .2s}
+.finder button:hover{background:var(--ink-2)}
+.finder button svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.prompts{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:13px}
+.prompts>span{font:400 7px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:rgba(245,239,227,.38);margin-right:2px}
+.prompt{border:1px solid rgba(245,239,227,.17);border-radius:99px;background:none;padding:6px 9px;color:rgba(245,239,227,.62);font:400 7.5px/1 var(--mono);letter-spacing:.02em;transition:all .2s}
+.prompt:hover{border-color:rgba(245,239,227,.45);color:var(--cream);background:rgba(245,239,227,.05)}
+
+/* Catalog */
+.catalog{max-width:1420px;margin:0 auto;padding:35px 28px 66px;scroll-margin-top:72px}
+.catalog-head{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.catalog-head .kicker{color:var(--rose-dark)}
+.catalog-title h2{margin-top:7px;font:400 clamp(35px,4vw,51px)/.98 var(--display);letter-spacing:-.035em;max-width:780px}
+.catalog-sub{margin-top:6px;font:400 8px/1.55 var(--mono);letter-spacing:.04em;color:var(--muted)}
+.catalog-tools{display:flex;align-items:center;gap:10px;flex:none;padding-bottom:2px}
+.clear-view{display:inline-flex;align-items:center;gap:5px;border:0;background:none;padding:5px 0;color:var(--rose-dark);font:500 7.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid transparent}
+.clear-view:hover{border-bottom-color:currentColor}
+.clear-view svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.interpretation{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:13px 0 0}
+.interpretation>span{font:400 6.8px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.interp-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #d4c3b5;border-radius:99px;background:#f4e4d8;color:#8c4d40;font:500 7px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase}
+.interp-chip::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor}
+.family-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:17px 0 20px}
+.family-chip{border:1px solid var(--line);border-radius:99px;background:none;padding:7px 12px;color:var(--muted);font:500 7.5px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;transition:all .2s}
+.family-chip:hover{border-color:var(--ink);color:var(--ink)}
+.family-chip.active{background:var(--ink);border-color:var(--ink);color:var(--cream)}
+.family-divider{width:1px;height:16px;background:var(--line);margin:0 4px}
+.family-note{font:400 7px/1.3 var(--mono);letter-spacing:.02em;color:var(--muted);margin-left:auto}
+.scent-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 16px}
+.scent-card{position:relative;min-width:0}
+.card-main{display:block;width:100%;padding:0;border:0;background:none;text-align:left}
+.card-main:focus-visible{outline:2px solid var(--rose);outline-offset:5px}
+.save-btn{position:absolute;top:10px;right:10px;z-index:3;display:grid;place-items:center;width:33px;height:33px;border:1px solid rgba(255,255,255,.43);border-radius:50%;background:rgba(249,244,233,.66);backdrop-filter:blur(8px);color:var(--ink);transition:all .2s}
+.save-btn:hover{background:var(--cream);transform:scale(1.05)}
+.save-btn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round}
+.save-btn.is-saved{background:var(--ink);border-color:var(--ink);color:var(--citron)}
+.save-btn.is-saved svg{fill:currentColor;stroke:currentColor}
+.scent-art{--art-base:#ddd5c8;--art-a:#c7b8a5;--art-b:#f1eadc;--art-ink:#3a322b;position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:2px;background:radial-gradient(circle at 26% 22%,var(--art-a),transparent 58%),radial-gradient(circle at 76% 78%,var(--art-b),transparent 60%),var(--art-base);color:var(--art-ink);isolation:isolate;transition:filter .3s}
+.scent-art::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.1),transparent 35%,rgba(10,8,12,.09));mix-blend-mode:multiply;pointer-events:none}
+.scent-card:hover .scent-art{filter:saturate(1.06)}
+.scent-number{position:absolute;left:13px;top:12px;z-index:2;font:500 7px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase;opacity:.7}
+.aura-orb{position:absolute;left:50%;top:47%;width:55%;aspect-ratio:1;transform:translate(-50%,-50%);border:1px solid color-mix(in srgb,var(--art-ink) 22%,transparent);border-radius:50%;transition:transform .55s var(--ease);display:grid;place-items:center}
+.aura-orb::before{content:'';position:absolute;inset:22%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.32),rgba(255,255,255,0) 70%);filter:blur(3px)}
+.aura-orb i{position:absolute;border:1px solid color-mix(in srgb,var(--art-ink) 18%,transparent);border-radius:50%}
+.aura-orb i:nth-child(1){inset:13%}
+.aura-orb i:nth-child(2){inset:29%;border-color:color-mix(in srgb,var(--art-ink) 26%,transparent)}
+.aura-orb i:nth-child(3){inset:43%;background:color-mix(in srgb,var(--art-ink) 7%,transparent)}
+.scent-card:hover .aura-orb{transform:translate(-50%,-50%) scale(1.07)}
+.scent-art-notes{position:absolute;left:13px;right:13px;bottom:12px;z-index:2;font:400 6.5px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;opacity:.68;max-width:85%}
+.match-badge{display:inline-flex;align-items:center;gap:5px;margin-bottom:8px;padding:3px 7px;border-radius:2px;background:var(--ink);color:var(--citron);font:500 6.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.match-badge::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor}
+.scent-info{padding:12px 1px 0}
+.scent-name-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.scent-name-row h3{font:500 25px/1 var(--display);letter-spacing:-.025em}
+.scent-price{font:400 8px/1 var(--mono);color:var(--muted);white-space:nowrap}
+.scent-tagline{margin-top:4px;font-size:10.5px;line-height:1.45;color:var(--muted);min-height:2.9em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.scent-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;padding-top:7px;border-top:1px solid var(--line)}
+.scent-family{font:500 6.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--rose-dark)}
+.scent-intensity{display:flex;align-items:center;gap:3px}
+.scent-intensity i{width:4px;height:4px;border-radius:50%;background:var(--line-2)}
+.scent-intensity i.on{background:var(--ink)}
+.empty-results{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;min-height:340px;border:1px dashed var(--line-2);border-radius:3px;background:rgba(249,244,233,.38);padding:30px}
+.empty-results svg{width:34px;height:34px;fill:none;stroke:var(--line-2);stroke-width:1.1;stroke-linecap:round}
+.empty-results h3{font:500 30px/1.1 var(--display);letter-spacing:-.02em}
+.empty-results p{max-width:340px;color:var(--muted);font-size:11px;line-height:1.6}
+.empty-results button{margin-top:5px;border:0;border-bottom:1px solid currentColor;background:none;padding:4px 0;color:var(--rose-dark);font:500 7.5px/1 var(--mono);letter-spacing:.07em;text-transform:uppercase}
+.collection-note{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:30px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted)}
+.collection-note p{max-width:550px;font-size:10.5px;line-height:1.65}
+.collection-note p strong{color:var(--ink);font-weight:600}
+.collection-note span{font:400 7px/1.5 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);max-width:280px}
+/* Shelf drawer */
+.shelf-drawer{position:fixed;inset:0 0 0 auto;margin:0;width:min(390px,92vw);height:100dvh;max-height:100dvh;padding:0;border:0;border-left:1px solid var(--line-2);background:var(--card);color:var(--ink);box-shadow:-28px 0 70px rgba(25,19,27,.24);overflow:hidden}
+.shelf-drawer[open]{display:flex;flex-direction:column;animation:drawerIn .34s var(--ease)}
+@keyframes drawerIn{from{opacity:.4;transform:translateX(34px)}}
+.shelf-drawer::backdrop{background:rgba(25,19,27,.48);backdrop-filter:blur(3px)}
+.shelf-head{flex:none;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:22px 22px 17px;border-bottom:1px solid var(--line)}
+.shelf-head .kicker{color:var(--rose-dark)}
+.shelf-head h2{margin-top:5px;font:500 38px/1 var(--display);letter-spacing:-.03em}
+.drawer-close{display:grid;place-items:center;width:31px;height:31px;border:1px solid var(--line);border-radius:50%;background:none;color:var(--muted);transition:all .2s;flex:none}
+.drawer-close:hover{border-color:var(--ink);color:var(--ink);background:var(--paper)}
+.drawer-close svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+.shelf-intro{flex:none;padding:12px 22px 0;font-size:10px;line-height:1.55;color:var(--muted)}
+.shelf-list{flex:1;min-height:0;overflow-y:auto;padding:10px 22px 12px}
+.shelf-item{display:grid;grid-template-columns:53px minmax(0,1fr) auto;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)}
+.shelf-swatch{position:relative;width:53px;height:62px;overflow:hidden;border-radius:2px;background:radial-gradient(circle at 30% 22%,var(--sw-a),transparent 58%),radial-gradient(circle at 75% 80%,var(--sw-b),transparent 62%),var(--sw-base)}
+.shelf-swatch::after{content:'';position:absolute;inset:28%;border:1px solid color-mix(in srgb,var(--sw-ink) 25%,transparent);border-radius:50%}
+.shelf-copy{min-width:0}
+.shelf-copy h3{font:500 20px/1.05 var(--display);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shelf-copy p{margin-top:2px;font:500 6.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--rose-dark)}
+.shelf-copy span{display:block;margin-top:5px;font:400 7px/1 var(--mono);color:var(--muted)}
+.remove-scent{display:grid;place-items:center;width:27px;height:27px;border:1px solid transparent;border-radius:50%;background:none;color:var(--muted);transition:all .2s}
+.remove-scent:hover{border-color:var(--line);color:var(--danger);background:var(--paper)}
+.remove-scent svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.shelf-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;gap:8px;border-bottom:1px solid var(--line)}
+.shelf-empty .empty-orbit{position:relative;width:72px;height:72px;border:1px solid var(--line-2);border-radius:50%;margin-bottom:8px}
+.shelf-empty .empty-orbit::before,.shelf-empty .empty-orbit::after{content:'';position:absolute;border-radius:50%;border:1px solid var(--line)}
+.shelf-empty .empty-orbit::before{inset:14px}
+.shelf-empty .empty-orbit::after{inset:28px;background:var(--citron);border:0}
+.shelf-empty h3{font:500 27px/1.1 var(--display)}
+.shelf-empty p{max-width:230px;color:var(--muted);font-size:10px;line-height:1.6}
+.shelf-foot{flex:none;padding:15px 22px 18px;border-top:1px solid var(--line);background:var(--paper)}
+.shelf-count-line{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px;font:400 7px/1 var(--mono);letter-spacing:.04em;color:var(--muted)}
+.shelf-count-line button{border:0;background:none;padding:4px 0;color:var(--rose-dark);font:500 7px/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid transparent}
+.shelf-count-line button:hover{border-bottom-color:currentColor}
+.shelf-count-line button[hidden]{display:none}
+.btn-dark{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 13px;border:1px solid var(--ink);border-radius:2px;background:var(--ink);color:var(--cream);font:500 8px/1 var(--mono);letter-spacing:.07em;text-transform:uppercase;transition:all .2s}
+.btn-dark:hover:not(:disabled){background:var(--ink-2);border-color:var(--ink-2)}
+.btn-dark:disabled{opacity:.35;cursor:not-allowed}
+.btn-dark svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.btn-quiet{display:inline-flex;align-items:center;justify-content:center;height:38px;padding:0 13px;border:1px solid var(--line-2);border-radius:2px;background:none;color:var(--ink);font:500 8px/1 var(--mono);letter-spacing:.07em;text-transform:uppercase}
+.btn-quiet:hover{background:var(--paper)}
+.shelf-foot .btn-dark{width:100%}
+.compare-note{margin-top:8px;text-align:center;font:400 6.5px/1.4 var(--mono);color:var(--muted);letter-spacing:.02em}
+
+/* Detail dialog */
+.scent-dialog{width:min(860px,calc(100% - 24px));max-height:min(92dvh,760px);padding:0;border:0;border-radius:3px;background:var(--card);color:var(--ink);box-shadow:0 40px 100px rgba(25,19,27,.35);overflow:auto}
+.scent-dialog[open]{animation:dialogIn .32s var(--ease)}
+@keyframes dialogIn{from{opacity:0;transform:translateY(10px) scale(.993)}}
+.scent-dialog::backdrop{background:rgba(25,19,27,.52);backdrop-filter:blur(3px)}
+.detail-grid{display:grid;grid-template-columns:.84fr 1.16fr;min-height:590px}
+.detail-art{--art-base:#ddd5c8;--art-a:#c7b8a5;--art-b:#f1eadc;--art-ink:#3a322b;position:relative;overflow:hidden;padding:19px;display:flex;flex-direction:column;background:radial-gradient(circle at 25% 22%,var(--art-a),transparent 57%),radial-gradient(circle at 78% 80%,var(--art-b),transparent 62%),var(--art-base);color:var(--art-ink)}
+.detail-art::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 40%,rgba(10,8,12,.08));mix-blend-mode:multiply;pointer-events:none}
+.detail-art-top{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;font:500 6.5px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase;opacity:.68}
+.detail-orb{position:relative;z-index:1;width:72%;aspect-ratio:1;margin:auto;border:1px solid color-mix(in srgb,var(--art-ink) 22%,transparent);border-radius:50%;display:grid;place-items:center}
+.detail-orb::before{content:'';position:absolute;inset:17%;border:1px solid color-mix(in srgb,var(--art-ink) 18%,transparent);border-radius:50%}
+.detail-orb::after{content:'';position:absolute;inset:35%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.36),color-mix(in srgb,var(--art-ink) 8%,transparent) 68%);filter:blur(1px)}
+.detail-art-notes{position:relative;z-index:2;margin-top:auto;padding-top:30px;font:400 6.5px/1.6 var(--mono);letter-spacing:.06em;text-transform:uppercase;opacity:.65;max-width:88%}
+.detail-body{position:relative;padding:31px 34px 25px;display:flex;flex-direction:column}
+.detail-close{position:absolute;top:17px;right:18px;display:grid;place-items:center;width:31px;height:31px;border:1px solid var(--line);border-radius:50%;background:none;color:var(--muted);transition:all .2s}
+.detail-close:hover{border-color:var(--ink);color:var(--ink);background:var(--paper)}
+.detail-close svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+.detail-family{font:500 7px/1 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--rose-dark)}
+.detail-body h2{margin-top:8px;padding-right:26px;font:500 51px/.94 var(--display);letter-spacing:-.035em}
+.detail-tagline{margin-top:8px;font:italic 400 16px/1.35 var(--display);color:var(--muted)}
+.detail-desc{margin-top:12px;font-size:10.5px;line-height:1.65;color:#5f584f;max-width:470px}
+.note-list{margin-top:17px;border-top:1px solid var(--line)}
+.note-row{display:grid;grid-template-columns:57px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.note-row span{font:500 6.5px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.note-row p{font:400 14px/1.4 var(--display);color:var(--ink)}
+.detail-facts{display:grid;grid-template-columns:1.1fr .8fr .8fr;gap:10px;margin-top:16px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.fact span{display:block;font:500 6.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.fact strong{display:block;margin-top:6px;font:500 8.5px/1 var(--mono);letter-spacing:.02em}
+.dots{display:flex;gap:3px;margin-top:7px}
+.dots i{width:5px;height:5px;border-radius:50%;background:var(--line-2)}
+.dots i.on{background:var(--ink)}
+.detail-reasons{margin-top:13px;padding:10px 12px;border:1px solid #dccabb;border-radius:2px;background:#f4e5da}
+.detail-reasons>span{font:500 6.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--rose-dark)}
+.reason-list{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.reason-list span{padding:3px 6px;border-radius:99px;background:rgba(255,255,255,.55);color:#7e463b;font:500 6.5px/1 var(--mono);letter-spacing:.02em}
+.detail-foot{display:flex;align-items:center;gap:12px;justify-content:space-between;margin-top:auto;padding-top:18px}
+.detail-foot>span{font:400 6.5px/1.5 var(--mono);color:var(--muted);text-align:right;max-width:165px}
+.detail-save{min-width:142px}
+.detail-save.is-saved{background:var(--rose-dark);border-color:var(--rose-dark)}
+
+/* Compare */
+.compare-dialog{width:min(940px,calc(100% - 24px));max-height:min(92dvh,760px);padding:0;border:0;border-radius:3px;background:var(--card);color:var(--ink);box-shadow:0 40px 100px rgba(25,19,27,.35);overflow:auto}
+.compare-dialog[open]{animation:dialogIn .32s var(--ease)}
+.compare-dialog::backdrop{background:rgba(25,19,27,.56);backdrop-filter:blur(3px)}
+.compare-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:21px 24px 15px;border-bottom:1px solid var(--line)}
+.compare-head .kicker{color:var(--rose-dark)}
+.compare-head h2{margin-top:5px;font:500 36px/1 var(--display);letter-spacing:-.03em}
+.compare-head p{margin-top:4px;font-size:9.5px;color:var(--muted)}
+.compare-grid{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(195px,1fr);gap:10px;overflow-x:auto;padding:18px 24px 20px}
+.compare-card{border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper)}
+.compare-art{height:112px;position:relative;background:radial-gradient(circle at 28% 25%,var(--sw-a),transparent 58%),radial-gradient(circle at 76% 80%,var(--sw-b),transparent 65%),var(--sw-base)}
+.compare-art::after{content:'';position:absolute;inset:26%;border:1px solid color-mix(in srgb,var(--sw-ink) 22%,transparent);border-radius:50%}
+.compare-copy{padding:11px 12px 12px}
+.compare-copy h3{font:500 23px/1 var(--display);letter-spacing:-.025em}
+.compare-copy .family{margin-top:4px;font:500 6.5px/1 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--rose-dark)}
+.compare-rows{margin-top:10px;border-top:1px solid var(--line)}
+.compare-row{display:flex;justify-content:space-between;gap:7px;padding:5px 0;border-bottom:1px solid var(--line);font-size:8px}
+.compare-row span{font:400 6px/1.4 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.compare-row strong{font:500 6.8px/1.4 var(--mono);text-align:right;color:var(--ink)}
+.compare-foot{padding:12px 24px 16px;border-top:1px solid var(--line);font:400 6.5px/1.5 var(--mono);color:var(--muted);letter-spacing:.03em;text-transform:uppercase}
+
+/* Toast and footer */
+.toast{position:fixed;left:50%;bottom:22px;z-index:120;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 24px);padding:9px 11px 9px 14px;border-radius:2px;background:var(--ink);color:var(--cream);box-shadow:0 14px 40px rgba(25,19,27,.3);font:500 7.5px/1.3 var(--mono);letter-spacing:.04em;opacity:0;transform:translate(-50%,12px);pointer-events:none;transition:all .3s var(--ease)}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{border:1px solid rgba(245,239,227,.28);border-radius:2px;background:none;color:var(--cream);padding:4px 8px;font:500 7px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.toast button:hover{background:rgba(245,239,227,.1)}
+.toast button[hidden]{display:none}
+.site-footer{background:var(--ink);color:rgba(245,239,227,.6);padding:31px 28px}
+.footer-inner{max-width:1420px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.footer-brand{display:flex;align-items:center;gap:10px;color:var(--cream)}
+.footer-brand .brand-name{font-size:25px}
+.footer-brand p{font:400 7px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:rgba(245,239,227,.4)}
+.site-footer>div>p{font:400 7px/1.5 var(--mono);letter-spacing:.05em;text-transform:uppercase}
+
+@media (max-width:1180px){
+  .scent-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .hero-rings{right:3%;opacity:.5}
+  .hero-note{width:225px}
+}
+@media (max-width:960px){
+  .header-meta{display:none}
+  .hero-top{display:block}
+  .hero-note{width:auto;max-width:430px;margin-top:20px;padding:0 0 0 15px;border-left:1px solid rgba(245,239,227,.18)}
+  .hero-rings{width:310px;height:310px;right:-45px;top:-10px;opacity:.35}
+  .hero h1{font-size:74px}
+  .scent-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 13px}
+  .detail-grid{grid-template-columns:.75fr 1.25fr}
+  .detail-body{padding:28px 27px 23px}
+  .detail-body h2{font-size:45px}
+}
+@media (max-width:760px){
+  .header-inner{height:59px;padding:0 17px;gap:16px}
+  .brand-sub{display:none}
+  .brand-name{font-size:26px}
+  .brand-mark{width:27px;height:27px}
+  .shelf-btn{height:32px;padding:0 9px}
+  .hero-inner{padding:38px 17px 31px}
+  .hero h1{font-size:58px;max-width:560px}
+  .hero-note{max-width:390px;font-size:10.5px}
+  .hero-rings{display:none}
+  .finder-wrap{margin-top:27px}
+  .finder{padding:6px}
+  .finder input{font-size:13px}
+  .finder input::placeholder{font-size:15px}
+  .finder button{height:39px;padding:0 12px}
+  .prompts>span{width:100%;margin-bottom:1px}
+  .catalog{padding:26px 16px 46px}
+  .catalog-head{display:block;padding-bottom:13px}
+  .catalog-tools{margin-top:10px}
+  .catalog-title h2{font-size:39px}
+  .family-row{margin:14px 0 17px}
+  .family-note{display:none}
+  .scent-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:21px 10px}
+  .scent-name-row h3{font-size:23px}
+  .scent-tagline{font-size:9.5px}
+  .scent-art-notes{font-size:6px}
+  .collection-note{display:block}
+  .collection-note span{display:block;margin-top:9px}
+  .detail-grid{grid-template-columns:1fr;min-height:0}
+  .detail-art{min-height:235px;padding:16px}
+  .detail-orb{width:43%;position:absolute;right:14%;top:50%;transform:translateY(-38%)}
+  .detail-art-notes{padding-top:120px;max-width:55%}
+  .detail-body{padding:25px 22px 20px}
+  .detail-body h2{font-size:44px}
+  .detail-close{top:12px;right:13px;background:var(--card)}
+  .detail-foot{padding-top:15px}
+  .shelf-head{padding:19px 18px 15px}
+  .shelf-list{padding:8px 18px 10px}
+  .shelf-intro{padding-left:18px;padding-right:18px}
+  .shelf-foot{padding:13px 18px 16px}
+  .compare-head{padding:18px 17px 13px}
+  .compare-grid{padding:15px 17px 17px}
+  .compare-foot{padding:11px 17px 14px}
+  .footer-inner{display:block}
+  .site-footer>div>p{margin-top:11px}
+}
+@media (max-width:560px){
+  .finder{flex-wrap:wrap;gap:5px}
+  .finder>svg{margin-left:8px}
+  .finder input{width:calc(100% - 55px);flex:none}
+  .finder button{width:100%;height:38px}
+  .hero h1{font-size:51px}
+  .hero-note{padding-left:0;border-left:0;padding-top:12px;border-top:1px solid rgba(245,239,227,.16)}
+  .catalog-title h2{font-size:35px}
+  .family-row{gap:5px}
+  .family-chip{padding:6px 9px}
+  .scent-grid{gap:18px 9px}
+  .scent-name-row h3{font-size:21px}
+  .scent-price{font-size:7px}
+  .scent-tagline{font-size:9px}
+  .save-btn{width:29px;height:29px;top:8px;right:8px}
+  .scent-art-notes{left:9px;right:9px;bottom:9px;font-size:5.5px}
+  .scent-number{left:9px;top:9px;font-size:6px}
+  .match-badge{font-size:6px}
+  .interp-chip{font-size:6.5px}
+  .detail-art{min-height:205px}
+  .detail-art-notes{padding-top:100px}
+  .detail-body h2{font-size:39px}
+  .detail-tagline{font-size:15px}
+  .detail-facts{grid-template-columns:1fr 1fr}
+  .detail-facts .fact:first-child{grid-column:1/-1}
+  .detail-foot{display:block}
+  .detail-save{width:100%}
+  .detail-foot>span{display:block;margin-top:9px;text-align:center;max-width:none}
+  .compare-head h2{font-size:31px}
+  .toast{font-size:6.5px}
+  .site-footer{padding:25px 17px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#collection">Skip to the collection</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="#top" aria-label="Aura home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Aura</span>
+      <span class="brand-sub">Olfactive studies</span>
+    </a>
+    <p class="header-meta">16 compositions · 50 ml · mixed in small batches</p>
+    <div class="header-actions">
+      <button class="shelf-btn" type="button" id="shelfBtn" aria-haspopup="dialog" aria-controls="shelfDrawer">
+        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M7 12s-4.5-2.7-4.5-6A2.7 2.7 0 0 1 7 4.2 2.7 2.7 0 0 1 11.5 6c0 3.3-4.5 6-4.5 6z"/></svg>
+        Shelf
+        <span class="count" id="shelfCount">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="pageTitle">
+    <div class="hero-rings" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="hero-inner">
+      <div class="hero-top">
+        <div>
+          <p class="kicker">The fragrance wardrobe</p>
+          <h1 id="pageTitle">Find a scent<br>that feels like <em>you.</em></h1>
+        </div>
+        <p class="hero-note">
+          <strong>A quieter way to choose</strong>
+          Describe a mood, a place, or a half-remembered moment. Aura listens for notes, seasons and intensity, then finds the closest compositions.
+          <span>16 small-batch scents · 50 ml</span>
+        </p>
+      </div>
+
+      <div class="finder-wrap">
+        <form class="finder" id="searchForm" role="search">
+          <svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.5" cy="7.5" r="4.7"/><path d="M11 11l4 4"/></svg>
+          <label class="sr" for="queryInput">Describe the scent you are looking for</label>
+          <input id="queryInput" type="search" placeholder="A soft citrus for early mornings…" autocomplete="off" spellcheck="false">
+          <button type="submit">
+            Find my scent
+            <svg viewBox="0 0 13 13" aria-hidden="true"><path d="M1.5 6.5h10M7.5 2.5l4 4-4 4"/></svg>
+          </button>
+        </form>
+        <div class="prompts" id="promptList">
+          <span>Try</span>
+          <button class="prompt" type="button" data-query="soft citrus for early mornings">soft citrus for early mornings</button>
+          <button class="prompt" type="button" data-query="warm and woody, under $150">warm &amp; woody, under $150</button>
+          <button class="prompt" type="button" data-query="green and quiet for the office">green &amp; quiet for the office</button>
+          <button class="prompt" type="button" data-query="a bold floral for evenings">a bold floral for evenings</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="catalog" id="collection" aria-labelledby="resultsTitle">
+    <header class="catalog-head">
+      <div class="catalog-title">
+        <p class="kicker">The collection</p>
+        <h2 id="resultsTitle">The full wardrobe</h2>
+        <p class="catalog-sub" id="resultsSub">Sixteen compositions · matched on this device</p>
+      </div>
+      <div class="catalog-tools">
+        <button class="clear-view" id="clearView" type="button" hidden>
+          Reset view
+          <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 2l6 6M8 2L2 8"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="interpretation" id="interpretation" hidden></div>
+
+    <div class="family-row" id="familyRow" role="group" aria-label="Filter by scent family">
+      <button class="family-chip active" type="button" data-family="all" aria-pressed="true">All scents</button>
+      <button class="family-chip" type="button" data-family="citrus" aria-pressed="false">Citrus</button>
+      <button class="family-chip" type="button" data-family="floral" aria-pressed="false">Floral</button>
+      <button class="family-chip" type="button" data-family="woody" aria-pressed="false">Woody</button>
+      <button class="family-chip" type="button" data-family="amber" aria-pressed="false">Amber</button>
+      <button class="family-chip" type="button" data-family="fresh" aria-pressed="false">Fresh</button>
+      <span class="family-divider" aria-hidden="true"></span>
+      <span class="family-note">A scent can belong to more than one family</span>
+    </div>
+
+    <div class="scent-grid" id="scentGrid"></div>
+
+    <div class="empty-results" id="emptyResults" hidden>
+      <svg viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="12"/><circle cx="17" cy="17" r="4"/><path d="M17 2v5M17 27v5M2 17h5M27 17h5"/></svg>
+      <h3>Nothing quite matched</h3>
+      <p id="emptyMessage">Try a mood, a note family or a budget — or browse the full wardrobe.</p>
+      <button id="emptyClear" type="button">Reset the view</button>
+    </div>
+
+    <p class="sr" id="liveStatus" aria-live="polite"></p>
+
+    <div class="collection-note">
+      <p><strong>Aura explains the match.</strong> The finder reads families, notes, moods, seasons and intensity from your words. No account, no tracking, no far-away model.</p>
+      <span>Every comparison happens locally in this browser.</span>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div><span class="brand-name">Aura</span><p>Small-batch scent studies · made slowly</p></div>
+    </div>
+    <p>Independent demo · 16 compositions · all matching on-device</p>
+  </div>
+</footer>
+
+<dialog class="shelf-drawer" id="shelfDrawer" aria-labelledby="shelfTitle">
+  <header class="shelf-head">
+    <div>
+      <p class="kicker">Saved for later</p>
+      <h2 id="shelfTitle">Your shelf</h2>
+    </div>
+    <button class="drawer-close" type="button" id="closeShelf" aria-label="Close the shelf">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+    </button>
+  </header>
+  <p class="shelf-intro">Keep the scents you want to revisit. Compare their notes side by side before choosing a favourite.</p>
+  <div class="shelf-list" id="shelfList"></div>
+  <div class="shelf-empty" id="shelfEmpty">
+    <span class="empty-orbit" aria-hidden="true"></span>
+    <h3>Nothing on the shelf</h3>
+    <p>Save a scent with the small heart on any card. It will wait here for you.</p>
+  </div>
+  <footer class="shelf-foot">
+    <div class="shelf-count-line">
+      <span id="shelfSummary">0 scents saved</span>
+      <button id="clearShelf" type="button" hidden>Clear shelf</button>
+    </div>
+    <button class="btn-dark" id="compareShelf" type="button" disabled>
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M1.5 3h3v7h-3zM7.5 2h3v8h-3z"/></svg>
+      Compare scents
+    </button>
+    <p class="compare-note" id="compareNote">Choose at least two to compare</p>
+  </footer>
+</dialog>
+
+<dialog class="scent-dialog" id="scentDialog" aria-labelledby="detailName">
+  <div class="detail-grid">
+    <div class="detail-art" id="detailArt">
+      <div class="detail-art-top"><span id="detailNumber">Nº 01</span><span>Scent study</span></div>
+      <div class="detail-orb" aria-hidden="true"></div>
+      <p class="detail-art-notes" id="detailArtNotes"></p>
+    </div>
+    <div class="detail-body">
+      <button class="detail-close" type="button" id="detailClose" aria-label="Close scent details">
+        <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+      </button>
+      <p class="detail-family" id="detailFamily"></p>
+      <h2 id="detailName"></h2>
+      <p class="detail-tagline" id="detailTagline"></p>
+      <p class="detail-desc" id="detailDesc"></p>
+      <div class="note-list" id="detailNotes"></div>
+      <div class="detail-facts">
+        <div class="fact"><span>Intensity</span><div class="dots" id="detailIntensity"></div></div>
+        <div class="fact"><span>Volume</span><strong>50 ml</strong></div>
+        <div class="fact"><span>Price</span><strong id="detailPrice"></strong></div>
+      </div>
+      <div class="detail-reasons" id="detailReasons" hidden>
+        <span>Why it fits</span>
+        <div class="reason-list" id="detailReasonList"></div>
+      </div>
+      <div class="detail-foot">
+        <button class="btn-dark detail-save" type="button" id="detailSave">Save to shelf</button>
+        <span>Small-batch eau de parfum · discovery vials with every order</span>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="compare-dialog" id="compareDialog" aria-labelledby="compareTitle">
+  <header class="compare-head">
+    <div>
+      <p class="kicker">On your shelf</p>
+      <h2 id="compareTitle">Side by side</h2>
+      <p>Notes, mood and intensity at a glance.</p>
+    </div>
+    <button class="drawer-close" type="button" id="closeCompare" aria-label="Close the comparison">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+    </button>
+  </header>
+  <div class="compare-grid" id="compareGrid"></div>
+  <p class="compare-foot">Aura keeps every note in plain sight — the choice stays yours.</p>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span id="toastText"></span>
+  <button id="toastUndo" type="button" hidden>Undo</button>
+</div>
+<script>
+(() => {
+  const SHELF_KEY = 'aura_shelf_v1';
+  const PRODUCTS = [
+    { id: 'serein', number: '01', name: 'Serein', family: 'Fresh citrus', families: ['citrus', 'fresh'], tagline: 'Bright air after rain.', description: 'A clean, sunlit citrus that softens into tea and warm skin. Composed for the first hour of the day, when the air is still cool.', top: ['Bergamot', 'Neroli', 'Yuzu'], heart: ['White tea', 'Orange blossom'], base: ['White musk', 'Cedar'], moods: ['calm', 'bright', 'clean'], occasions: ['morning', 'work', 'everyday'], seasons: ['spring', 'summer'], intensity: 2, price: 128, palette: { base: '#d9e4da', a: '#f0e1a7', b: '#a9c5cc', ink: '#36504a' } },
+    { id: 'mosslight', number: '02', name: 'Mosslight', family: 'Green woods', families: ['fresh', 'woody'], tagline: 'A walled garden after rain.', description: 'Fig leaf and cut stems over a quiet vetiver base. The smell of a walled garden after rain, without any sweetness.', top: ['Fig leaf', 'Galbanum', 'Bergamot'], heart: ['Green tea', 'Violet leaf'], base: ['Vetiver', 'Moss', 'White musk'], moods: ['calm', 'quiet', 'grounded'], occasions: ['work', 'everyday', 'weekend'], seasons: ['spring', 'autumn'], intensity: 2, price: 142, palette: { base: '#c9d2ba', a: '#7f986d', b: '#e2d9a3', ink: '#2f4434' } },
+    { id: 'nocturne', number: '03', name: 'Nocturne', family: 'Floral amber', families: ['floral', 'amber'], tagline: 'Tuberose in low light.', description: 'Tuberose and incense in low light. A floral with weight, made for late dinners and a coat left on the back of a chair.', top: ['Bergamot', 'Pink pepper'], heart: ['Tuberose', 'Jasmine'], base: ['Incense', 'Patchouli', 'Amber'], moods: ['romantic', 'mysterious', 'confident'], occasions: ['evening', 'date', 'weekend'], seasons: ['autumn', 'winter'], intensity: 4, price: 185, palette: { base: '#342b3b', a: '#7e5e6f', b: '#b88c73', ink: '#f2e7d6' } },
+    { id: 'paper-rain', number: '04', name: 'Paper Rain', family: 'Soft floral', families: ['floral', 'fresh'], tagline: 'Pressed linen and cold air.', description: 'Iris, cold air and cedar shavings. A pale, tailored scent that sits close to the skin like a freshly pressed shirt.', top: ['Aldehydes', 'Bergamot'], heart: ['Iris', 'Violet'], base: ['Cedar', 'White musk'], moods: ['calm', 'quiet', 'elegant', 'clean'], occasions: ['work', 'everyday'], seasons: ['spring', 'autumn'], intensity: 1, price: 138, palette: { base: '#ded8e5', a: '#bfc8dc', b: '#eee7d5', ink: '#4b4456' } },
+    { id: 'ember-fig', number: '05', name: 'Ember Fig', family: 'Warm woods', families: ['amber', 'woody'], tagline: 'A kitchen window in autumn.', description: 'Ripe fig, cardamom and sandalwood. Warm without dessert, the scent of a kitchen window open onto autumn.', top: ['Fig', 'Cardamom'], heart: ['Sandalwood', 'Tonka'], base: ['Amber', 'Cedar'], moods: ['cozy', 'grounded', 'romantic'], occasions: ['evening', 'weekend'], seasons: ['autumn', 'winter'], intensity: 3, price: 146, palette: { base: '#c98f6a', a: '#8f4f38', b: '#e8bc8c', ink: '#3a2118' } },
+    { id: 'orchard-hour', number: '06', name: 'Orchard Hour', family: 'Fruity floral', families: ['fresh', 'floral'], tagline: 'The last warm hour outside.', description: 'Pear skin, mimosa and a little dry hay. Bright and easy, with the soft blur of a late-summer afternoon.', top: ['Pear', 'Neroli'], heart: ['Mimosa', 'Hay'], base: ['White musk', 'Cedar'], moods: ['bright', 'playful', 'clean'], occasions: ['morning', 'everyday', 'weekend'], seasons: ['spring', 'summer'], intensity: 2, price: 96, palette: { base: '#e6d3a0', a: '#e7a06d', b: '#f2e6b9', ink: '#5a3a20' } },
+    { id: 'vanilla-smoke', number: '07', name: 'Vanilla Smoke', family: 'Amber woods', families: ['amber', 'woody'], tagline: 'Low lamps and a slow evening.', description: 'Vanilla, tobacco and a thread of smoke. Deep and lingering, for cold evenings and rooms with low lamps.', top: ['Vanilla', 'Pink pepper'], heart: ['Tobacco', 'Tonka'], base: ['Birch tar', 'Incense'], moods: ['cozy', 'mysterious', 'confident', 'bold'], occasions: ['evening', 'date', 'weekend'], seasons: ['autumn', 'winter'], intensity: 5, price: 195, palette: { base: '#3a2d25', a: '#8a5c39', b: '#d4a66f', ink: '#f6ead9' } },
+    { id: 'iris-no-4', number: '08', name: 'Iris No. 4', family: 'Powdery floral', families: ['floral'], tagline: 'A pressed shirt, close to the skin.', description: 'Powdered iris and suede with a violet hush. Understated and expensive-feeling, close to the skin from morning to evening.', top: ['Iris', 'Violet leaf'], heart: ['Orris', 'Suede'], base: ['Cedar', 'Musk'], moods: ['elegant', 'quiet', 'romantic', 'soft'], occasions: ['work', 'everyday', 'evening'], seasons: ['spring', 'autumn'], intensity: 2, price: 168, palette: { base: '#bcb4c8', a: '#9b8fa9', b: '#e0d8c6', ink: '#3f3749' } },
+    { id: 'salt-garden', number: '09', name: 'Salt Garden', family: 'Coastal aromatic', families: ['fresh'], tagline: 'Sea air on weathered stone.', description: 'Sea salt, rosemary and weathered stone. A bracing green freshness that grows warmer as the day goes on.', top: ['Sea salt', 'Bergamot'], heart: ['Rosemary', 'Sage'], base: ['Ambergris', 'Moss'], moods: ['clean', 'calm', 'grounded', 'bright'], occasions: ['morning', 'everyday', 'weekend'], seasons: ['spring', 'summer'], intensity: 3, price: 148, palette: { base: '#aebfbb', a: '#7f9c98', b: '#dfe0cd', ink: '#2f4644' } },
+    { id: 'little-jasmine', number: '10', name: 'Little Jasmine', family: 'Soft floral', families: ['floral'], tagline: 'Jasmine, held back by tea.', description: 'Jasmine held back by green tea and rice milk. Soft, clean and quietly floral, with nothing demanding attention.', top: ['Green tea', 'Jasmine'], heart: ['Rice milk', 'Orange blossom'], base: ['White musk', 'Sandalwood'], moods: ['calm', 'soft', 'quiet', 'elegant'], occasions: ['morning', 'work', 'everyday'], seasons: ['spring', 'summer'], intensity: 2, price: 122, palette: { base: '#e9e3d2', a: '#f2edd9', b: '#b8c8a8', ink: '#4e5441' } },
+    { id: 'bitter-orange', number: '11', name: 'Bitter Orange', family: 'Bitter citrus', families: ['citrus', 'fresh'], tagline: 'A citrus with a polished edge.', description: 'Bitter orange peel, petitgrain and oakmoss. A sharper citrus with the polish of an old barbershop and a bitter edge.', top: ['Bitter orange', 'Petitgrain'], heart: ['Neroli', 'Green mandarin'], base: ['Oakmoss', 'Vetiver'], moods: ['bright', 'confident', 'clean'], occasions: ['morning', 'work', 'everyday'], seasons: ['spring', 'summer'], intensity: 3, price: 98, palette: { base: '#db9a50', a: '#e8b96d', b: '#b55027', ink: '#44200f' } },
+    { id: 'sunday-vetiver', number: '12', name: 'Sunday Vetiver', family: 'Fresh woods', families: ['fresh', 'woody'], tagline: 'Nowhere to be.', description: 'Grapefruit, vetiver and cashmere wood. The clean, grounded feeling of a Sunday with nowhere to be.', top: ['Grapefruit', 'Sage'], heart: ['Vetiver', 'Lavender'], base: ['Cashmere wood', 'Musk'], moods: ['calm', 'quiet', 'grounded'], occasions: ['morning', 'everyday', 'weekend'], seasons: ['spring', 'autumn'], intensity: 2, price: 152, palette: { base: '#aab197', a: '#7f8b65', b: '#d9cf9e', ink: '#30371f' } },
+    { id: 'rose-later', number: '13', name: 'Rose, Later', family: 'Rose woods', families: ['floral', 'woody'], tagline: 'A rose with a little bite.', description: 'Rose after it has lost its shyness: pink pepper, patchouli and cedar. Romantic, but with a little bite.', top: ['Rose', 'Pink pepper'], heart: ['Rose absolute', 'Geranium'], base: ['Patchouli', 'Cedar', 'Amber'], moods: ['romantic', 'confident', 'elegant'], occasions: ['evening', 'date', 'weekend'], seasons: ['spring', 'autumn'], intensity: 3, price: 174, palette: { base: '#c99493', a: '#b87373', b: '#e4c5b9', ink: '#4b252a' } },
+    { id: 'black-tea-room', number: '14', name: 'Black Tea Room', family: 'Dry amber', families: ['woody', 'amber'], tagline: 'A desk by the window.', description: 'Black tea, osmanthus and worn leather. A dry, woody scent for a desk by a window and a long afternoon of work.', top: ['Black tea', 'Bergamot'], heart: ['Osmanthus', 'Leather'], base: ['Tobacco', 'Sandalwood', 'Oakmoss'], moods: ['mysterious', 'quiet', 'confident', 'cozy'], occasions: ['evening', 'work', 'weekend'], seasons: ['autumn', 'winter'], intensity: 4, price: 164, palette: { base: '#6c5544', a: '#3e2e25', b: '#b38558', ink: '#f2e5d1' } },
+    { id: 'milk-magnolia', number: '15', name: 'Milk & Magnolia', family: 'Creamy floral', families: ['floral', 'fresh'], tagline: 'Clean linen in a warm cupboard.', description: 'Magnolia, fig milk and white musk. Creamy and gentle, like clean linen folded into a warm cupboard.', top: ['Magnolia', 'Almond milk'], heart: ['Fig milk', 'Iris'], base: ['White musk', 'Sandalwood'], moods: ['calm', 'soft', 'romantic', 'cozy'], occasions: ['morning', 'everyday', 'weekend'], seasons: ['spring', 'summer'], intensity: 1, price: 132, palette: { base: '#e7dfcf', a: '#f2eadb', b: '#d8c3b2', ink: '#55463a' } },
+    { id: 'high-meadow', number: '16', name: 'High Meadow', family: 'Aromatic woods', families: ['fresh', 'woody'], tagline: 'Cut grass and open air.', description: 'Lavender, sage and tonka over pale woods. Open air, cut grass and a calm that follows you home.', top: ['Lavender', 'Bergamot'], heart: ['Sage', 'Hay'], base: ['Tonka', 'Cedar'], moods: ['calm', 'clean', 'bright', 'grounded', 'quiet'], occasions: ['morning', 'everyday', 'weekend'], seasons: ['spring', 'summer'], intensity: 3, price: 144, palette: { base: '#b4c2c7', a: '#879fa9', b: '#d6cf9f', ink: '#2e3c43' } }
+  ];
+
+  const LEXICON = [
+    { words: ['citrus', 'lemon', 'zesty', 'yuzu', 'bergamot', 'neroli', 'orange', 'grapefruit', 'petitgrain'], family: 'citrus', label: 'citrus' },
+    { words: ['floral', 'flower', 'flowers', 'peony', 'gardenia'], family: 'floral', label: 'floral' },
+    { words: ['woody', 'wood', 'woods', 'cedar', 'sandalwood', 'vetiver', 'patchouli', 'oakmoss', 'birch'], family: 'woody', label: 'woody' },
+    { words: ['amber', 'warm', 'sweet', 'gourmand', 'resin', 'spicy'], family: 'amber', label: 'amber' },
+    { words: ['fresh', 'green', 'airy', 'marine', 'aquatic', 'aromatic', 'herbal', 'crisp'], family: 'fresh', label: 'fresh' },
+    { words: ['rose'], family: 'floral', note: 'rose', label: 'rose' },
+    { words: ['jasmine'], family: 'floral', note: 'jasmine', label: 'jasmine' },
+    { words: ['iris', 'orris'], family: 'floral', note: 'iris', label: 'iris' },
+    { words: ['tuberose'], family: 'floral', note: 'tuberose', label: 'tuberose' },
+    { words: ['magnolia'], family: 'floral', note: 'magnolia', label: 'magnolia' },
+    { words: ['mimosa'], family: 'floral', note: 'mimosa', label: 'mimosa' },
+    { words: ['violet'], family: 'floral', note: 'violet', label: 'violet' },
+    { words: ['fig'], note: 'fig', label: 'fig' },
+    { words: ['tea'], note: 'tea', label: 'tea' },
+    { words: ['salt', 'salty', 'seaside'], family: 'fresh', note: 'sea salt', label: 'salt' },
+    { words: ['incense', 'smoky', 'smoke'], note: 'incense', label: 'incense' },
+    { words: ['vanilla'], family: 'amber', note: 'vanilla', label: 'vanilla' },
+    { words: ['tobacco'], family: 'amber', note: 'tobacco', label: 'tobacco' },
+    { words: ['leather'], family: 'woody', note: 'leather', label: 'leather' },
+    { words: ['cardamom'], note: 'cardamom', label: 'cardamom' },
+    { words: ['lavender'], family: 'fresh', note: 'lavender', label: 'lavender' },
+    { words: ['sage'], family: 'fresh', note: 'sage', label: 'sage' },
+    { words: ['clean', 'soapy'], family: 'fresh', mood: 'clean', label: 'clean' },
+    { words: ['calm', 'serene', 'peaceful', 'soothing'], mood: 'calm', label: 'calm' },
+    { words: ['quiet', 'understated'], mood: 'quiet', label: 'quiet' },
+    { words: ['cozy', 'comforting'], mood: 'cozy', label: 'cozy' },
+    { words: ['romantic'], mood: 'romantic', label: 'romantic' },
+    { words: ['mysterious', 'dark', 'moody'], mood: 'mysterious', label: 'mysterious' },
+    { words: ['elegant', 'refined', 'polished', 'expensive'], mood: 'elegant', label: 'elegant' },
+    { words: ['bold', 'strong', 'intense', 'loud', 'statement', 'lingering', 'powerful'], intensity: 5, label: 'bold' },
+    { words: ['soft', 'light', 'subtle', 'delicate', 'whisper'], intensity: 1, label: 'soft' },
+    { words: ['work', 'office', 'weekday', 'professional'], occasion: 'work', label: 'for work' },
+    { words: ['everyday', 'daily', 'signature', 'all day'], occasion: 'everyday', label: 'everyday' },
+    { words: ['morning', 'early'], occasion: 'morning', label: 'morning' },
+    { words: ['evening', 'night', 'date', 'dinner', 'party', 'wedding'], occasion: 'evening', label: 'evening' },
+    { words: ['weekend', 'sunday'], occasion: 'weekend', label: 'weekend' },
+    { words: ['spring'], season: 'spring', label: 'spring' },
+    { words: ['summer', 'hot'], season: 'summer', label: 'summer' },
+    { words: ['autumn', 'fall'], season: 'autumn', label: 'autumn' },
+    { words: ['winter', 'cold'], season: 'winter', label: 'winter' }
+  ];
+
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+  const queryInput = $('#queryInput');
+  const resultsTitle = $('#resultsTitle');
+  const resultsSub = $('#resultsSub');
+  const interpretation = $('#interpretation');
+  const clearView = $('#clearView');
+  const scentGrid = $('#scentGrid');
+  const emptyResults = $('#emptyResults');
+  const emptyMessage = $('#emptyMessage');
+  const liveStatus = $('#liveStatus');
+  const shelfBtn = $('#shelfBtn');
+  const shelfCount = $('#shelfCount');
+  const shelfDrawer = $('#shelfDrawer');
+  const shelfList = $('#shelfList');
+  const shelfEmpty = $('#shelfEmpty');
+  const shelfSummary = $('#shelfSummary');
+  const clearShelf = $('#clearShelf');
+  const compareShelf = $('#compareShelf');
+  const compareNote = $('#compareNote');
+  const scentDialog = $('#scentDialog');
+  const compareDialog = $('#compareDialog');
+  const detailArt = $('#detailArt');
+  const detailNumber = $('#detailNumber');
+  const detailName = $('#detailName');
+  const detailFamily = $('#detailFamily');
+  const detailTagline = $('#detailTagline');
+  const detailDesc = $('#detailDesc');
+  const detailNotes = $('#detailNotes');
+  const detailArtNotes = $('#detailArtNotes');
+  const detailIntensity = $('#detailIntensity');
+  const detailPrice = $('#detailPrice');
+  const detailReasons = $('#detailReasons');
+  const detailReasonList = $('#detailReasonList');
+  const detailSave = $('#detailSave');
+  const compareGrid = $('#compareGrid');
+  const toast = $('#toast');
+  const toastText = $('#toastText');
+  const toastUndo = $('#toastUndo');
+
+  const storage = (() => {
+    try {
+      const probe = '__aura_probe__';
+      window.localStorage.setItem(probe, '1');
+      window.localStorage.removeItem(probe);
+      return window.localStorage;
+    } catch {
+      return null;
+    }
+  })();
+
+  const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  let shelf = (() => {
+    try {
+      const parsed = JSON.parse((storage && storage.getItem(SHELF_KEY)) || '[]');
+      return Array.isArray(parsed) ? parsed.filter(id => PRODUCTS.some(product => product.id === id)) : [];
+    } catch {
+      return [];
+    }
+  })();
+  let activeFamily = 'all';
+  let lastReasons = new Map();
+  let currentProductId = null;
+  let toastTimer = 0;
+  let undoAction = null;
+
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]);
+  }
+
+  function truncate(value, max = 44) {
+    return value.length > max ? `${value.slice(0, max - 1).trimEnd()}…` : value;
+  }
+
+  function escapeRegex(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function hasWord(text, word) {
+    return new RegExp(`(^|[^a-z])${escapeRegex(word)}([^a-z]|$)`, 'i').test(text);
+  }
+
+  function paletteStyle(product) {
+    const palette = product.palette;
+    return `--art-base:${palette.base};--art-a:${palette.a};--art-b:${palette.b};--art-ink:${palette.ink}`;
+  }
+
+  function swatchStyle(product) {
+    const palette = product.palette;
+    return `--sw-base:${palette.base};--sw-a:${palette.a};--sw-b:${palette.b};--sw-ink:${palette.ink}`;
+  }
+
+  function interpretQuery(query) {
+    const text = query.toLowerCase();
+    const context = {
+      families: new Set(), notes: new Set(), moods: new Set(), occasions: new Set(), seasons: new Set(),
+      intensity: null, budget: null, labels: []
+    };
+    const addLabel = label => {
+      if (label && !context.labels.includes(label)) context.labels.push(label);
+    };
+    LEXICON.forEach(entry => {
+      if (!entry.words.some(word => hasWord(text, word))) return;
+      const hasSpecific = Boolean(entry.note || entry.mood || entry.occasion || entry.season || entry.intensity !== undefined);
+      if (entry.family) {
+        context.families.add(entry.family);
+        if (!hasSpecific) addLabel(entry.label || entry.family);
+      }
+      if (entry.note) {
+        context.notes.add(entry.note);
+        addLabel(entry.label || entry.note);
+      }
+      if (entry.mood) {
+        context.moods.add(entry.mood);
+        addLabel(entry.label || entry.mood);
+      }
+      if (entry.occasion) {
+        context.occasions.add(entry.occasion);
+        addLabel(entry.label || entry.occasion);
+      }
+      if (entry.season) {
+        context.seasons.add(entry.season);
+        addLabel(entry.label || entry.season);
+      }
+      if (entry.intensity !== undefined) {
+        context.intensity = entry.intensity;
+        addLabel(entry.label);
+      }
+    });
+    const budgetMatch = text.match(/(?:under|below|less than|up to|max(?:imum)?(?: of)?|budget(?: of)?)\s*\$?\s*(\d{2,4})/)
+      || text.match(/\$\s*(\d{2,4})/);
+    if (budgetMatch) {
+      context.budget = Number(budgetMatch[1]);
+      context.labels.unshift(`under $${context.budget}`);
+    }
+    context.meaningful = Boolean(context.families.size || context.notes.size || context.moods.size
+      || context.occasions.size || context.seasons.size || context.intensity !== null);
+    context.labels = context.labels.slice(0, 5);
+    return context;
+  }
+
+  function notesCorpus(product) {
+    return [product.name, ...product.top, ...product.heart, ...product.base].join(' ').toLowerCase();
+  }
+
+  function scoreProduct(product, context) {
+    let score = 0;
+    const reasons = [];
+    context.families.forEach(family => {
+      if (product.families.includes(family)) {
+        score += 5;
+        reasons.push(family);
+      }
+    });
+    const corpus = notesCorpus(product);
+    context.notes.forEach(note => {
+      if (corpus.includes(note)) {
+        score += 4;
+        reasons.push(note);
+      }
+    });
+    context.moods.forEach(mood => {
+      if (product.moods.includes(mood)) {
+        score += 3;
+        reasons.push(mood);
+      }
+    });
+    context.occasions.forEach(occasion => {
+      if (product.occasions.includes(occasion)) {
+        score += 2;
+        reasons.push(occasion);
+      }
+    });
+    context.seasons.forEach(season => {
+      if (product.seasons.includes(season)) {
+        score += 2;
+        reasons.push(season);
+      }
+    });
+    if (context.intensity !== null) {
+      const difference = Math.abs(product.intensity - context.intensity);
+      if (difference === 0) score += 3;
+      else if (difference === 1) score += 1;
+      else if (difference >= 3) score -= 2;
+      if (difference <= 1) reasons.push(context.intensity <= 2 ? 'soft profile' : 'bold profile');
+    }
+    return { score, reasons: [...new Set(reasons)].slice(0, 3) };
+  }
+
+  function computeView() {
+    const query = queryInput.value.trim();
+    const context = query ? interpretQuery(query) : null;
+    if (!query) {
+      const items = PRODUCTS.filter(product => activeFamily === 'all' || product.families.includes(activeFamily));
+      lastReasons = new Map();
+      return { query, context: null, items, budgetEmpty: false, familyEmpty: false, meaningful: false };
+    }
+    const budgetPool = PRODUCTS.filter(product => context.budget === null || product.price <= context.budget);
+    const budgetEmpty = context.budget !== null && budgetPool.length === 0;
+    const familyPool = budgetPool.filter(product => activeFamily === 'all' || product.families.includes(activeFamily));
+    const familyEmpty = activeFamily !== 'all' && budgetPool.length > 0 && familyPool.length === 0;
+    const scored = familyPool.map(product => ({ ...product, ...scoreProduct(product, context) }))
+      .sort((a, b) => b.score - a.score || a.number.localeCompare(b.number));
+    const positive = scored.filter(product => product.score > 0);
+    let items;
+    if (positive.length) items = positive.slice(0, 8);
+    else if (context.meaningful) items = scored.slice(0, 8);
+    else items = scored;
+    lastReasons = new Map(items.map(product => [product.id, product.reasons]));
+    return { query, context, items, budgetEmpty, familyEmpty, meaningful: context.meaningful };
+  }
+
+  function renderInterpretation(context, query) {
+    interpretation.replaceChildren();
+    if (!query || !context || !context.labels.length) {
+      interpretation.hidden = true;
+      return;
+    }
+    interpretation.hidden = false;
+    const label = document.createElement('span');
+    label.textContent = 'Listening for';
+    interpretation.append(label);
+    context.labels.forEach(text => {
+      const chip = document.createElement('span');
+      chip.className = 'interp-chip';
+      chip.textContent = text;
+      interpretation.append(chip);
+    });
+  }
+
+  function cardHTML(product, index, hasQuery) {
+    const isSaved = shelf.includes(product.id);
+    const notes = [...product.top.slice(0, 2), product.heart[0]].join(' · ');
+    const dots = Array.from({ length: 5 }, (_, dotIndex) => `<i class="${dotIndex < product.intensity ? 'on' : ''}"></i>`).join('');
+    return `
+      <article class="scent-card">
+        <button class="card-main" type="button" data-open="${product.id}" aria-label="View ${escapeHTML(product.name)}">
+          <div class="scent-art" style="${paletteStyle(product)}">
+            <span class="scent-number">Nº ${product.number}</span>
+            <div class="aura-orb" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span class="scent-art-notes">${escapeHTML(notes)}</span>
+          </div>
+          <div class="scent-info">
+            ${hasQuery && index === 0 ? '<span class="match-badge">Closest match</span>' : ''}
+            <div class="scent-name-row">
+              <h3>${escapeHTML(product.name)}</h3>
+              <span class="scent-price">${money.format(product.price)}</span>
+            </div>
+            <p class="scent-tagline">${escapeHTML(product.tagline)}</p>
+            <div class="scent-foot">
+              <span class="scent-family">${escapeHTML(product.family)}</span>
+              <span class="scent-intensity" aria-label="Intensity ${product.intensity} of 5">${dots}</span>
+            </div>
+          </div>
+        </button>
+        <button class="save-btn${isSaved ? ' is-saved' : ''}" type="button" data-save="${product.id}" aria-pressed="${isSaved}" aria-label="${isSaved ? 'Remove' : 'Save'} ${escapeHTML(product.name)} ${isSaved ? 'from' : 'to'} your shelf">
+          <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M7 12s-4.5-2.7-4.5-6A2.7 2.7 0 0 1 7 4.2 2.7 2.7 0 0 1 11.5 6c0 3.3-4.5 6-4.5 6z"/></svg>
+        </button>
+      </article>`;
+  }
+
+  function render() {
+    const view = computeView();
+    const hasQuery = Boolean(view.query);
+    const familyLabel = activeFamily === 'all' ? '' : activeFamily;
+    if (hasQuery) {
+      resultsTitle.textContent = `Scents for “${truncate(view.query)}”`;
+    } else if (familyLabel) {
+      resultsTitle.textContent = `The ${familyLabel} wardrobe`;
+    } else {
+      resultsTitle.textContent = 'The full wardrobe';
+    }
+    if (view.items.length) {
+      if (hasQuery) {
+        resultsSub.textContent = view.meaningful
+          ? `${view.items.length} ${view.items.length === 1 ? 'scent' : 'scents'} selected · matched on this device`
+          : `${view.items.length} compositions · no specific note caught, showing the collection`;
+      } else {
+        resultsSub.textContent = `${view.items.length} ${view.items.length === 1 ? 'composition' : 'compositions'} · matched on this device`;
+      }
+    } else if (view.budgetEmpty) {
+      resultsSub.textContent = 'No compositions within that budget';
+    } else {
+      resultsSub.textContent = 'No compositions in this view';
+    }
+    clearView.hidden = !hasQuery && activeFamily === 'all';
+    renderInterpretation(view.context, hasQuery);
+    $$('.family-chip').forEach(chip => {
+      const active = chip.dataset.family === activeFamily;
+      chip.classList.toggle('active', active);
+      chip.setAttribute('aria-pressed', String(active));
+    });
+    scentGrid.innerHTML = view.items.map((product, index) => cardHTML(product, index, hasQuery)).join('');
+    const isEmpty = view.items.length === 0;
+    scentGrid.hidden = isEmpty;
+    emptyResults.hidden = !isEmpty;
+    if (isEmpty) {
+      if (view.budgetEmpty) {
+        emptyMessage.textContent = `Nothing in the wardrobe sits under ${money.format(view.context.budget)}. Try a little more headroom or a different note.`;
+      } else if (view.familyEmpty) {
+        emptyMessage.textContent = `The ${activeFamily} family has nothing at that budget. Try All scents or another family.`;
+      } else {
+        emptyMessage.textContent = 'Try a mood, a note family or a budget — or browse the full wardrobe.';
+      }
+    }
+  }
+
+  function saveShelf() {
+    if (!storage) return;
+    try {
+      storage.setItem(SHELF_KEY, JSON.stringify(shelf));
+    } catch {
+      showToast('This browser could not save your shelf');
+    }
+  }
+
+  function syncShelfUI() {
+    shelfCount.textContent = String(shelf.length);
+    $$('.save-btn').forEach(button => {
+      const product = PRODUCTS.find(item => item.id === button.dataset.save);
+      const saved = shelf.includes(button.dataset.save);
+      button.classList.toggle('is-saved', saved);
+      button.setAttribute('aria-pressed', String(saved));
+      if (product) button.setAttribute('aria-label', `${saved ? 'Remove' : 'Save'} ${product.name} ${saved ? 'from' : 'to'} your shelf`);
+    });
+    const current = PRODUCTS.find(product => product.id === currentProductId);
+    if (current) {
+      const saved = shelf.includes(current.id);
+      detailSave.classList.toggle('is-saved', saved);
+      detailSave.textContent = saved ? 'On your shelf' : 'Save to shelf';
+      detailSave.setAttribute('aria-pressed', String(saved));
+    }
+    renderShelf();
+  }
+
+  function toggleShelf(id) {
+    const product = PRODUCTS.find(item => item.id === id);
+    if (!product) return;
+    const wasSaved = shelf.includes(id);
+    shelf = wasSaved ? shelf.filter(item => item !== id) : [...shelf, id];
+    saveShelf();
+    syncShelfUI();
+    liveStatus.textContent = wasSaved ? `${product.name} removed from your shelf.` : `${product.name} saved to your shelf.`;
+  }
+
+  function renderShelf() {
+    const saved = shelf.map(id => PRODUCTS.find(product => product.id === id)).filter(Boolean);
+    shelfList.hidden = saved.length === 0;
+    shelfEmpty.hidden = saved.length > 0;
+    shelfList.innerHTML = saved.map(product => `
+      <div class="shelf-item">
+        <span class="shelf-swatch" style="${swatchStyle(product)}" aria-hidden="true"></span>
+        <div class="shelf-copy">
+          <h3>${escapeHTML(product.name)}</h3>
+          <p>${escapeHTML(product.family)}</p>
+          <span>${money.format(product.price)} · 50 ml</span>
+        </div>
+        <button class="remove-scent" type="button" data-remove="${product.id}" aria-label="Remove ${escapeHTML(product.name)} from your shelf">
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+        </button>
+      </div>`).join('');
+    shelfSummary.textContent = `${saved.length} ${saved.length === 1 ? 'scent' : 'scents'} saved`;
+    clearShelf.hidden = saved.length === 0;
+    compareShelf.disabled = saved.length < 2;
+    compareNote.textContent = saved.length < 2 ? 'Choose at least two to compare' : `Compare all ${saved.length} on your shelf`;
+  }
+
+  function syncBodyLock() {
+    const open = scentDialog.open || shelfDrawer.open || compareDialog.open;
+    document.body.classList.toggle('locked', open);
+  }
+
+  function openShelf() {
+    renderShelf();
+    shelfDrawer.showModal();
+    syncBodyLock();
+    window.setTimeout(() => $('#closeShelf').focus(), 30);
+  }
+
+  function openDetail(id) {
+    const product = PRODUCTS.find(item => item.id === id);
+    if (!product) return;
+    currentProductId = id;
+    detailArt.style.cssText = paletteStyle(product);
+    detailNumber.textContent = `Nº ${product.number}`;
+    detailName.textContent = product.name;
+    detailFamily.textContent = product.family;
+    detailTagline.textContent = product.tagline;
+    detailDesc.textContent = product.description;
+    detailNotes.innerHTML = [
+      ['Top', product.top],
+      ['Heart', product.heart],
+      ['Base', product.base]
+    ].map(([label, notes]) => `<div class="note-row"><span>${label}</span><p>${notes.map(escapeHTML).join(' · ')}</p></div>`).join('');
+    detailArtNotes.textContent = [...product.top.slice(0, 2), ...product.base.slice(0, 1)].join(' · ');
+    detailIntensity.innerHTML = Array.from({ length: 5 }, (_, index) => `<i class="${index < product.intensity ? 'on' : ''}"></i>`).join('');
+    detailPrice.textContent = `${money.format(product.price)} / 50 ml`;
+    const reasons = lastReasons.get(product.id) || [];
+    detailReasons.hidden = reasons.length === 0;
+    detailReasonList.innerHTML = reasons.map(reason => `<span>${escapeHTML(reason)}</span>`).join('');
+    const saved = shelf.includes(product.id);
+    detailSave.classList.toggle('is-saved', saved);
+    detailSave.textContent = saved ? 'On your shelf' : 'Save to shelf';
+    detailSave.setAttribute('aria-pressed', String(saved));
+    scentDialog.showModal();
+    syncBodyLock();
+    window.setTimeout(() => $('#detailClose').focus(), 30);
+  }
+
+  function renderCompare() {
+    const saved = shelf.map(id => PRODUCTS.find(product => product.id === id)).filter(Boolean);
+    compareGrid.innerHTML = saved.map(product => `
+      <article class="compare-card">
+        <div class="compare-art" style="${swatchStyle(product)}" aria-hidden="true"></div>
+        <div class="compare-copy">
+          <h3>${escapeHTML(product.name)}</h3>
+          <p class="family">${escapeHTML(product.family)}</p>
+          <div class="compare-rows">
+            <div class="compare-row"><span>Top</span><strong>${escapeHTML(product.top.join(' · '))}</strong></div>
+            <div class="compare-row"><span>Heart</span><strong>${escapeHTML(product.heart.join(' · '))}</strong></div>
+            <div class="compare-row"><span>Base</span><strong>${escapeHTML(product.base.join(' · '))}</strong></div>
+            <div class="compare-row"><span>Mood</span><strong>${escapeHTML(product.moods.slice(0, 2).join(' · '))}</strong></div>
+            <div class="compare-row"><span>Intensity</span><strong>${product.intensity} / 5</strong></div>
+            <div class="compare-row"><span>Price</span><strong>${money.format(product.price)}</strong></div>
+          </div>
+        </div>
+      </article>`).join('');
+  }
+
+  function openCompare() {
+    if (shelf.length < 2) return;
+    renderCompare();
+    compareDialog.showModal();
+    syncBodyLock();
+    window.setTimeout(() => $('#closeCompare').focus(), 30);
+  }
+
+  function resetView() {
+    queryInput.value = '';
+    activeFamily = 'all';
+    render();
+    liveStatus.textContent = 'Showing the full collection.';
+  }
+
+  function runSearch(value) {
+    queryInput.value = value;
+    activeFamily = 'all';
+    render();
+    const count = Number(resultsSub.textContent.match(/^\d+/)?.[0] || 0);
+    liveStatus.textContent = value
+      ? `${count} scent${count === 1 ? '' : 's'} found for ${value}.`
+      : 'Showing the full collection.';
+    $('#collection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function hideToast() {
+    window.clearTimeout(toastTimer);
+    toast.classList.remove('show');
+    toastUndo.hidden = true;
+    undoAction = null;
+  }
+
+  function showToast(message, action = null) {
+    window.clearTimeout(toastTimer);
+    toastText.textContent = message;
+    undoAction = typeof action === 'function' ? action : null;
+    toastUndo.hidden = !undoAction;
+    toast.classList.add('show');
+    toastTimer = window.setTimeout(hideToast, 6500);
+  }
+
+  function clearShelfWithUndo() {
+    if (!shelf.length) return;
+    const previous = [...shelf];
+    shelf = [];
+    saveShelf();
+    syncShelfUI();
+    shelfDrawer.close();
+    liveStatus.textContent = 'Shelf cleared.';
+    showToast('Shelf cleared', () => {
+      shelf = previous;
+      saveShelf();
+      syncShelfUI();
+    });
+  }
+
+  $('#searchForm').addEventListener('submit', event => {
+    event.preventDefault();
+    const query = queryInput.value.trim();
+    if (!query) {
+      resetView();
+      queryInput.focus();
+      return;
+    }
+    runSearch(query);
+  });
+
+  $$('#promptList [data-query]').forEach(button => {
+    button.addEventListener('click', () => runSearch(button.dataset.query));
+  });
+
+  $('#familyRow').addEventListener('click', event => {
+    const button = event.target.closest('[data-family]');
+    if (!button) return;
+    activeFamily = button.dataset.family;
+    render();
+    liveStatus.textContent = activeFamily === 'all'
+      ? 'Showing every scent family.'
+      : `Showing the ${activeFamily} family.`;
+  });
+
+  clearView.addEventListener('click', () => {
+    resetView();
+    queryInput.focus();
+  });
+  $('#emptyClear').addEventListener('click', () => {
+    resetView();
+    queryInput.focus();
+  });
+
+  scentGrid.addEventListener('click', event => {
+    const saveButton = event.target.closest('[data-save]');
+    if (saveButton) {
+      toggleShelf(saveButton.dataset.save);
+      return;
+    }
+    const openButton = event.target.closest('[data-open]');
+    if (openButton) openDetail(openButton.dataset.open);
+  });
+
+  shelfBtn.addEventListener('click', openShelf);
+  $('#closeShelf').addEventListener('click', () => shelfDrawer.close());
+  shelfList.addEventListener('click', event => {
+    const removeButton = event.target.closest('[data-remove]');
+    if (removeButton) toggleShelf(removeButton.dataset.remove);
+  });
+  clearShelf.addEventListener('click', clearShelfWithUndo);
+  compareShelf.addEventListener('click', openCompare);
+
+  detailSave.addEventListener('click', () => {
+    if (currentProductId) toggleShelf(currentProductId);
+    if (currentProductId) {
+      const product = PRODUCTS.find(item => item.id === currentProductId);
+      if (product) {
+        const saved = shelf.includes(product.id);
+        detailSave.textContent = saved ? 'On your shelf' : 'Save to shelf';
+        detailSave.classList.toggle('is-saved', saved);
+        detailSave.setAttribute('aria-pressed', String(saved));
+      }
+    }
+  });
+  $('#detailClose').addEventListener('click', () => scentDialog.close());
+  $('#closeCompare').addEventListener('click', () => compareDialog.close());
+
+  [scentDialog, shelfDrawer, compareDialog].forEach(dialog => {
+    dialog.addEventListener('close', syncBodyLock);
+    dialog.addEventListener('click', event => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+
+  toastUndo.addEventListener('click', () => {
+    const action = undoAction;
+    hideToast();
+    if (action) action();
+  });
+
+  syncShelfUI();
+  render();
+})();
+</script>
+</body>
+</html>
