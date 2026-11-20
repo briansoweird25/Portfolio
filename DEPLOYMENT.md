@@ -6,7 +6,7 @@
 Portfolio-claude-gracious-ritchie-op5u93/
 ├── index.html                 # Main portfolio page
 ├── css/
-│   └── style.css             # Portfolio styles
+│   └── style.css             # Portfolio styles (glassmorphism)
 ├── js/
 │   └── main.js               # Portfolio JavaScript
 ├── assets/                   # Portfolio assets (images, icons)
