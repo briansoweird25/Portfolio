@@ -179,7 +179,6 @@
       navigator.clipboard.writeText(EMAIL).then(done, function () { say(EMAIL); });
     } else { say(EMAIL); }
   }
-  $('#copyMail').addEventListener('click', copyMail);
 
   /* ---- Command palette ---- */
   var pal = $('#palette'), palIn = $('#palInput'), palList = $('#palList');
@@ -245,32 +244,6 @@
   } else {
     $$('.reveal').forEach(function (r) { r.classList.add('in'); });
   }
-
-  /* ---- Contact form ---- */
-  var form = $('#contactForm'), msg = $('#msg'), count = $('#msgCount'), status = $('#formStatus');
-  msg.addEventListener('input', function () { count.textContent = msg.value.length + ' / 800'; });
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var bad = false;
-    $$('[required]', form).forEach(function (f) {
-      var invalid = !f.value.trim() || (f.type === 'email' && !/^\S+@\S+\.\S+$/.test(f.value));
-      f.setAttribute('aria-invalid', String(invalid));
-      if (invalid) bad = true;
-    });
-    status.className = 'form-status';
-    if (bad) { status.textContent = 'Please fill in all required fields correctly.'; status.classList.add('err'); return; }
-    status.textContent = 'Sending…';
-    var data = new URLSearchParams(new FormData(form)).toString();
-    fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: data })
-      .then(function (r) {
-        if (!r.ok) throw new Error(r.status);
-        form.reset(); count.textContent = '0 / 800';
-        status.textContent = "Message sent! I'll get back to you soon."; status.classList.add('ok');
-      })
-      .catch(function () {
-        status.textContent = 'Could not send. Please email ' + EMAIL + ' instead.'; status.classList.add('err');
-      });
-  });
 
   $('#year').textContent = new Date().getFullYear();
 })();
